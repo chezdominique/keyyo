@@ -90,8 +90,11 @@ class AdminKeyyoController extends ModuleAdminController
     public function makePhoneCall($number, $params)
     {
         $phoneNumber = $this->sanityzePhoneNumber($number);
+        $ln = strlen($phoneNumber);
+        $display_message = ($ln != 10 && $ln > 0) ? '<i class="icon-warning text-danger"></i>' : '';
 
-        $keyyo_link = '<a href="' . Context::getContext()->link->getAdminLink('AdminKeyyo') . '&ajax=1&action=KeyyoCall';
+        $keyyo_link = $display_message . ' <a href="' . Context::getContext()->link->getAdminLink('AdminKeyyo');
+        $keyyo_link .= '&ajax=1&action=KeyyoCall';
         $keyyo_link .= '&CALLE=' . $phoneNumber;
         $keyyo_link .= '&CALLE_NAME=' . $params['lastname'] . '_' . $params['firstname'];
         $keyyo_link .= '" class="keyyo_link">' . $phoneNumber . '</a>';
@@ -153,6 +156,7 @@ class AdminKeyyoController extends ModuleAdminController
 
     private function sanityzePhoneNumber($number)
     {
-        return $number;
+        $pattern = str_split(Configuration::get('KEYYO_NUMBER_FILTER'));
+        return str_replace($pattern, '', $number);
     }
 }

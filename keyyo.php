@@ -34,7 +34,8 @@ class Keyyo extends Module
 
     /* Set default configuration values here */
     protected $config = array(
-        'KEYYO_ACCOUNT' => "",
+        'KEYYO_ACCOUNT' => '',
+        'KEYYO_NUMBER_FILTER' => ' .-_+'
     );
 
     public function __construct()
