@@ -79,7 +79,8 @@ class Keyyo extends Module
         if (!parent::uninstall() or
             !$this->eraseConfig() or
             !$this->eraseTabs() or
-            !$this->alterEmployeeTable('remove')
+            !$this->alterEmployeeTable('remove') or
+            !$this->uninstallOverrides()
         ) {
             return false;
         }
@@ -89,7 +90,7 @@ class Keyyo extends Module
     public function alterEmployeeTable($method = 'add')
     {
         if ($method == 'add') {
-            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'employee ADD `keyyo_account` BIGINT (64) NULL';
+            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'employee ADD `keyyo_account` VARCHAR (15) NULL';
         } else {
             $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'employee DROP COLUMN `keyyo_account`';
         }
