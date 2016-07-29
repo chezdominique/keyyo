@@ -145,7 +145,7 @@ class AdminKeyyoController extends ModuleAdminController
                 $return = Tools::jsonEncode(array('msg' => 'Appel du ' . $calle . ' en cours.'));
                 die($return);
             } else {
-                $return = Tools::jsonEncode(array('msg' => 'Problème lors de l\'appel au ' . $calle));
+                $return = Tools::jsonEncode(array('msg' => 'Problème lors de l\'appel.'));
                 die($return);
             }
         }
