@@ -87,6 +87,12 @@ class AdminKeyyoController extends ModuleAdminController
         ';
     }
 
+    /**
+     * Création de l'url pour l'appel ajax vers le client
+     * @param $number
+     * @param $params
+     * @return string
+     */
     public function makePhoneCall($number, $params)
     {
         $phoneNumber = $this->sanityzePhoneNumber($number);
@@ -102,6 +108,12 @@ class AdminKeyyoController extends ModuleAdminController
         return $keyyo_link;
     }
 
+    /**
+     * Renvoie le lien vers la fiche client
+     * @param $token
+     * @param $id
+     * @return string
+     */
     public function displayAfficherLink($token, $id)
     {
         $tokenLite = Tools::getAdminTokenLite('AdminCustomers');
@@ -112,14 +124,13 @@ class AdminKeyyoController extends ModuleAdminController
 
     protected function getKeyyoAccount()
     {
-        $sql = 'SELECT keyyo_account FROM `' . _DB_PREFIX_ . 'employee` 
-        WHERE id_employee = ' . $this->context->employee->id;
-        $keyyo_account = Db::getInstance()->getRow($sql);
 
-        if (!empty($keyyo_account['keyyo_account'])) {
-            $keyyo_number = $keyyo_account['keyyo_account'];
+        $keyyo_account = $this->context->employee->getKeyyoNumber();
+
+        if (!empty($keyyo_account)) {
+            $keyyo_number = $keyyo_account;
         } else {
-            $keyyo_number = Configuration::get('KEYYO_ACCOUNT');
+            return false;
         }
         return $keyyo_number;
     }

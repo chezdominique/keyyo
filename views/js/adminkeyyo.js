@@ -34,7 +34,7 @@ $(document).ready(function(e){
             dataType: 'json'
         })
             .done(function(data) {
-                alert(data.msg);
+                alert(data.msg + data.account);
             })
             .fail(function(data) {
                 alert('Erreur : KEYYO refuse l\'appel.');

@@ -11,4 +11,10 @@ class Employee extends EmployeeCore
         );
         parent::__construct($id, $id_lang, $id_shop);
     }
+
+    public function getKeyyoNumber()
+    {
+        return $this->keyyo_account;
+    }
+
 }
