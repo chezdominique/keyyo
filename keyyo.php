@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AdminKeyyo File Doc Comment
  * AdminKeyyo Class Doc Comment
@@ -43,7 +44,6 @@ class Keyyo extends Module
         if (!defined('_PS_VERSION_')) {
             exit;
         }
-
         $this->name = 'keyyo';
         $this->tab = 'others';
         $this->version = '1.0.0';
@@ -58,6 +58,7 @@ class Keyyo extends Module
         $this->description = $this->l('Installe un lien permettant les appels via KEYYO.');
         $this->confirmUninstall = $this->l('Etes vous sur ?');
         $this->tabName = 'Keyyo';
+
     }
 
     public function install()
@@ -147,8 +148,16 @@ class Keyyo extends Module
 
     public function getContent()
     {
-        $this->postProcess();
-        $this->displayForm();
+        $keyyo_account = $this->context->employee->getKeyyoNumber();
+        if (!$keyyo_account) {
+            $this->html .= $this->displayError($this->l('Veuillez configurer votre numéro de compte KEYYO dans l\'onglet 
+            Employés vous correspondant'));
+        } else {
+            $this->html .= $this->displayConfirmation($this->l('Votre numéro de compte KEYYO est le ' . $keyyo_account));
+        }
+
+//        $this->postProcess();
+//        $this->displayForm();
 
         return $this->html;
     }
