@@ -147,8 +147,16 @@ class Keyyo extends Module
 
     public function getContent()
     {
-        $this->postProcess();
-        $this->displayForm();
+        $keyyo_account = $this->context->employee->getKeyyoNumber();
+        if (!$keyyo_account){
+            $this->html .= $this->displayError($this->l('Veuillez configurer votre numéro de compte KEYYO 
+            dans l\'onglet Administration>Employés '));
+        } else {
+            $this->html .= $this->displayConfirmation($this->l('Votre numéro de compte KEYYO est le ' . $keyyo_account));
+        }
+
+//        $this->postProcess();
+//        $this->displayForm();
 
         return $this->html;
     }
@@ -167,7 +175,7 @@ class Keyyo extends Module
                 $this->errors[] = 'Le numero n\'est pas au bon format.';
             }
 
-            // Error handling
+
             if ($this->errors) {
                 $this->html .= $this->displayError(implode($this->errors, '<br />'));
             } else {
