@@ -49,6 +49,7 @@ class Keyyo extends Module
         $this->version = '1.0.0';
         $this->author = 'Dominique';
         $this->need_instance = 0;
+        $this->controllers = array('notificationskeyyo');
 
         $this->bootstrap = true;
 
@@ -67,7 +68,8 @@ class Keyyo extends Module
             !$this->alterEmployeeTable() or
             !$this->createTabs() or
             !$this->registerHook('displayHeader') or
-            !$this->registerHook('displayBackOfficeHeader')
+            !$this->registerHook('displayBackOfficeHeader') or
+            !$this->registerHook('displayLeftColumn')
         ) {
             return false;
         }
@@ -241,5 +243,12 @@ class Keyyo extends Module
     {
         $this->context->controller->addCSS($this->_path . 'views/css/adminkeyyo.css', 'all');
         $this->context->controller->addJS($this->_path . 'views/js/adminkeyyo.js', 'all');
+    }
+
+    public function hookDisplayLeftColumn($params)
+    {
+        if ($this->context->customer->id == 2) {
+            return $this->display(__FILE__, 'notificationsKeyyo.tpl');
+        }
     }
 }
