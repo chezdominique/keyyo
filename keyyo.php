@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AdminKeyyo File Doc Comment
  * AdminKeyyo Class Doc Comment
@@ -34,8 +35,8 @@ class Keyyo extends Module
 
     /* Set default configuration values here */
     protected $config = array(
-        'KEYYO_ACCOUNT' => '',
-        'KEYYO_NUMBER_FILTER' => ' .-_+'
+        'KEYYO_ACCOUNT' => '', // Compte par defaut KEYYO
+        'KEYYO_NUMBER_FILTER' => ' .-_+' // Supprime les caractères suivant des numéros de téléphone
     );
 
     public function __construct()
@@ -92,9 +93,9 @@ class Keyyo extends Module
     public function alterEmployeeTable($method = 'add')
     {
         if ($method == 'add') {
-            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'employee ADD `keyyo_account` VARCHAR (15) NULL';
+            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'employee ADD `keyyo_caller` VARCHAR (15) NULL';
         } else {
-            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'employee DROP COLUMN `keyyo_account`';
+            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'employee DROP COLUMN `keyyo_caller`';
         }
 
         if (!Db::getInstance()->execute($sql)) {
@@ -149,16 +150,21 @@ class Keyyo extends Module
 
     public function getContent()
     {
-        $keyyo_account = $this->context->employee->getKeyyoNumber();
-        if (!$keyyo_account){
-            $this->html .= $this->displayError($this->l('Veuillez configurer votre numéro de compte KEYYO 
+        $keyyo_caller = $this->context->employee->getKeyyoCaller();
+        if (!$keyyo_caller) {
+            $this->html .= $this->displayError($this->l('Veuillez configurer votre numéro d\'appelé 
             dans l\'onglet Administration>Employés '));
         } else {
-            $this->html .= $this->displayConfirmation($this->l('Votre numéro de compte KEYYO est le ' . $keyyo_account));
+            $this->html .= $this->displayConfirmation($this->l('Votre numéro de compte KEYYO est le ' . $keyyo_caller));
         }
 
-//        $this->postProcess();
-//        $this->displayForm();
+        $keyyo_account = Configuration::get('KEYYO_ACCOUNT');
+        if (!$keyyo_account) {
+            $this->html .= $this->displayError($this->l('Veuillez entrer votre numéro de compte KEYYO'));
+        }
+
+        $this->postProcess();
+        $this->displayForm();
 
         return $this->html;
     }
@@ -252,5 +258,6 @@ class Keyyo extends Module
             $this->context->smarty->assign(array('lien' => $lien));
             return $this->display(__FILE__, 'notificationsKeyyo.tpl');
         }
+        return false;
     }
 }

@@ -125,10 +125,10 @@ class AdminKeyyoController extends ModuleAdminController
         return '<a href="' . $link . '" class="icon-search-plus"> Afficher</a>';
     }
 
-    protected function getKeyyoAccount()
+    protected function getKeyyoCaller()
     {
 
-        $keyyo_account = $this->context->employee->getKeyyoNumber();
+        $keyyo_account = $this->context->employee->getKeyyoCaller();
 
         if (!empty($keyyo_account)) {
             $keyyo_number = $keyyo_account;
@@ -140,7 +140,7 @@ class AdminKeyyoController extends ModuleAdminController
 
     public function ajaxProcessKeyyoCall()
     {
-        $account = $this->getKeyyoAccount();
+        $account = $this->getKeyyoCaller();
         $calle = Tools::getValue('CALLE');
         $calle_name = Tools::getValue('CALLE_NAME');
 

@@ -33,7 +33,7 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
             'firstname' => array('title' => $this->l('First Name')),
             'lastname' => array('title' => $this->l('Last Name')),
             'email' => array('title' => $this->l('Email address')),
-            'keyyo_account' => array('title' => $this->l('Compte Keyyo')),
+            'keyyo_caller' => array('title' => $this->l('Compte Keyyo')),
             'profile' => array('title' => $this->l('Profile'), 'type' => 'select', 'list' => $this->profiles_array,
                 'filter_key' => 'pl!name', 'class' => 'fixed-width-lg'),
             'active' => array('title' => $this->l('Active'), 'align' => 'center', 'active' => 'status',
@@ -94,7 +94,8 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
                     'class' => 'fixed-width-xxl',
                     'prefix' => '<i class="icon-phone"></i>',
                     'label' => $this->l('Compte Keyyo'),
-                    'name' => 'keyyo_account',
+                    'name' => 'keyyo_caller',
+                    'hint' => $this->l('Votre numéro au format international'),
                     'required' => false,
                     'autocomplete' => false
                 ),
