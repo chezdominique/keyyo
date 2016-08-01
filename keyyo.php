@@ -248,6 +248,8 @@ class Keyyo extends Module
     public function hookDisplayLeftColumn($params)
     {
         if ($this->context->customer->id == 2) {
+            $lien = '?account=33123456789&caller=33987654321&calle=123456987&type=SETUP';
+            $this->context->smarty->assign(array('lien' => $lien));
             return $this->display(__FILE__, 'notificationsKeyyo.tpl');
         }
     }
