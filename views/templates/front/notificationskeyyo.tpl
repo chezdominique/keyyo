@@ -6,5 +6,8 @@
 <br>
 <p>{$smarty.server.HTTP_HOST}{$smarty.server.REQUEST_URI}</p>
 
+{if $confirmation}
+    <p class="alert alert-success">{$confirmation}</p>
+{/if}
 {include file="$tpl_dir./errors.tpl"}
 

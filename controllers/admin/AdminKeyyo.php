@@ -28,7 +28,8 @@
  * International Registred Trademark & Property of PrestaShop SA
  */
 
-require_once(dirname(__FILE__ . '/../../classes/KeyyoClass.php'));
+//require_once(dirname(__FILE__) . '/../../classes/KeyyoClass.php');
+
 
 class AdminKeyyoController extends ModuleAdminController
 {
