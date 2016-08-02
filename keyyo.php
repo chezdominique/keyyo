@@ -46,6 +46,7 @@ class Keyyo extends Module
         }
 
         $this->name = 'keyyo';
+        $this->tableName = 'notification_keyyo';
         $this->tab = 'others';
         $this->version = '1.0.0';
         $this->author = 'Dominique';
@@ -70,7 +71,8 @@ class Keyyo extends Module
             !$this->createTabs() or
             !$this->registerHook('displayHeader') or
             !$this->registerHook('displayBackOfficeHeader') or
-            !$this->registerHook('displayLeftColumn')
+            !$this->registerHook('displayLeftColumn') or
+            !$this->createNotificationKeyyoTable()
         ) {
             return false;
         }
@@ -83,7 +85,7 @@ class Keyyo extends Module
             !$this->eraseConfig() or
             !$this->eraseTabs() or
             !$this->alterEmployeeTable('remove') or
-            !$this->uninstallOverrides()
+            !$this->removeNotificationKeyyoTable()
         ) {
             return false;
         }
@@ -101,6 +103,43 @@ class Keyyo extends Module
         if (!Db::getInstance()->execute($sql)) {
             return false;
         }
+        return true;
+    }
+
+    public function createNotificationKeyyoTable()
+    {
+        $sql = 'CREATE TABLE `'._DB_PREFIX_.$this->tableName.'` (
+            `id_notification_keyyo` INT (12) NOT NULL AUTO_INCREMENT,
+            `account` INT NULL,
+            `calle` INT NULL,
+            `caller` INT NULL,
+            `calle_name` VARCHAR (64) NULL,
+            `callref` VARCHAR (64) NULL,
+            `dref` VARCHAR (32) NULL,
+            `drefreplace` VARCHAR (32) NULL,
+            `isacd` BOOLEAN NULL,
+            `msg` VARCHAR (64) NULL,
+            `profil` VARCHAR (64) NULL,
+            `record` BOOLEAN NULL,
+            `redirectingnumber` INT (12) NULL,
+            `sessionid` VARCHAR (64) NULL,
+            `version` INT (12) NULL,
+            `tsms` VARCHAR (13) NULL,
+            `type` VARCHAR (16) NULL,
+            `id_employee` INT (12),
+            PRIMARY KEY (`id_notification_keyyo`)
+        ) ENGINE = ' ._MYSQL_ENGINE_;
+
+        if (!Db::getInstance()->execute($sql)) {
+            return false;
+        }
+        return true;
+    }
+
+    private function removeNotificationKeyyoTable()
+    {
+        if(!Db::getInstance()->Execute('DROP TABLE `'._DB_PREFIX_.$this->tableName.'`'))
+            return false;
         return true;
     }
 
@@ -260,4 +299,5 @@ class Keyyo extends Module
         }
         return false;
     }
+
 }

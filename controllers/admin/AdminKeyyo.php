@@ -155,10 +155,10 @@ class AdminKeyyoController extends ModuleAdminController
             die($return);
         } else {
             $keyyo_link = 'https://ssl.keyyo.com/makecall.html?ACCOUNT=' . $account;
-            $keyyo_link .= '&CALLE=' . $calle . '&CALLE_NAME=' . $calle_name;
+            $keyyo_link .= '&CALLE=' . $calle;
+            $keyyo_link .= '&CALLE_NAME=' . $calle_name;
 
             $fp = fopen($keyyo_link, 'r');
-
             if ($fp) {
                 $return = Tools::jsonEncode(array('msg' => 'Appel du ' . $calle . ' en cours.'));
                 die($return);

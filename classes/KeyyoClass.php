@@ -2,7 +2,7 @@
 
 class KeyyoClass extends ObjectModel
 {
-    public $id_keyyo;
+    public $id_notification_keyyo;
 
     /**
      * @var -Numéro de la ligne Keyyo (format international)
