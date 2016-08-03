@@ -125,28 +125,13 @@ class AdminKeyyoController extends ModuleAdminController
         return '<a href="' . $link . '" class="icon-search-plus"> Afficher</a>';
     }
 
-    protected function getKeyyoCaller()
-    {
-
-        $keyyo_account = $this->context->employee->getKeyyoCaller();
-
-        if (!empty($keyyo_account)) {
-            $keyyo_number = $keyyo_account;
-        } else {
-            return false;
-        }
-        return $keyyo_number;
-    }
-
     public function ajaxProcessKeyyoCall()
     {
-//        $account = '33430966096';
-//        $passsip = 'vLPPi6L5Lv';
 
         $keyyo_url = Configuration::get('KEYYO_URL');
-        $account = $this->getKeyyoCaller();
-        $callee = Tools::getValue('CALLEE');
-        $calle_name = Tools::getValue('CALLE_NAME');
+        $account = $this->context->employee->getKeyyoCaller();
+        $callee = Validate::isString(Tools::getValue('CALLEE'))?Tools::getValue('CALLEE'):'';
+        $calle_name = Validate::isString(Tools::getValue('CALLE_NAME'))?Tools::getValue('CALLE_NAME'):'';
 
         if (!$account) {
             $return = Tools::jsonEncode(array('msg' => 'Veuillez configurer votre numéro de compte KEYYO.'));
@@ -157,25 +142,15 @@ class AdminKeyyoController extends ModuleAdminController
             $return = Tools::jsonEncode(array('msg' => 'Il manque une information pour composer le numéro.'));
             die($return);
         } else {
-            $keyyo_link = $keyyo_url.'?ACCOUNT=' . $account;
+            $keyyo_link = $keyyo_url . '?ACCOUNT=' . $account;
             $keyyo_link .= '&CALLEE=' . $callee;
             $keyyo_link .= '&CALLE_NAME=' . $calle_name;
 
-//            $ch = curl_init();
-//
-//            curl_setopt($ch, CURLOPT_URL, $keyyo_link);
-//            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
-//            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-//            curl_setopt($ch, CURLOPT_USERPWD, $account . ":" . $passsip);
-//            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-//
-//            $fp = curl_exec($ch);
-//            curl_close($ch);
-//
-//            die($fp);
-
             $fp = fopen($keyyo_link, 'r');
-            if ($fp) {
+            $buffer = fgets($fp, 4096);
+            fclose($fp);
+
+            if ($buffer == 'OK') {
                 $return = Tools::jsonEncode(array('msg' => 'Appel du ' . $callee . ' en cours.'));
                 die($return);
             } else {

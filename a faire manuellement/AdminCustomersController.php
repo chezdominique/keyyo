@@ -1447,26 +1447,31 @@ class AdminCustomersControllerCore extends AdminController
 
     public function ajaxProcessKeyyoCall()
     {
-        $account = $this->getKeyyoCaller();
-        $calle = Tools::getValue('CALLE');
-        $calle_name = Tools::getValue('CALLE_NAME');
+
+        $keyyo_url = Configuration::get('KEYYO_URL');
+        $account = $this->context->employee->getKeyyoCaller();
+        $callee = Validate::isString(Tools::getValue('CALLEE'))?Tools::getValue('CALLEE'):'';
+        $calle_name = Validate::isString(Tools::getValue('CALLE_NAME'))?Tools::getValue('CALLE_NAME'):'';
 
         if (!$account) {
             $return = Tools::jsonEncode(array('msg' => 'Veuillez configurer votre numéro de compte KEYYO.'));
             die($return);
         }
 
-        if (!$calle || !$calle_name) {
+        if (!$callee || !$calle_name) {
             $return = Tools::jsonEncode(array('msg' => 'Il manque une information pour composer le numéro.'));
             die($return);
         } else {
-            $keyyo_link = 'https://ssl.keyyo.com/makecall.html?ACCOUNT=' . $account;
-            $keyyo_link .= '&CALLEE=' . $calle;
+            $keyyo_link = $keyyo_url . '?ACCOUNT=' . $account;
+            $keyyo_link .= '&CALLEE=' . $callee;
             $keyyo_link .= '&CALLE_NAME=' . $calle_name;
 
             $fp = fopen($keyyo_link, 'r');
-            if ($fp) {
-                $return = Tools::jsonEncode(array('msg' => 'Appel du ' . $calle . ' en cours.'));
+            $buffer = fgets($fp, 4096);
+            fclose($fp);
+
+            if ($buffer == 'OK') {
+                $return = Tools::jsonEncode(array('msg' => 'Appel du ' . $callee . ' en cours.'));
                 die($return);
             } else {
                 $return = Tools::jsonEncode(array('msg' => 'Problème lors de l\'appel.'));
