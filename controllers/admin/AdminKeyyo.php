@@ -71,12 +71,12 @@ class AdminKeyyoController extends ModuleAdminController
                 'title' => $this->l('Ville')),
             'phone' => array(
                 'title' => $this->l('Téléphone'),
-                'align' => 'center',
+                'align' => 'left',
                 'callback' => 'makePhoneCall'
             ),
             'phone_mobile' => array(
                 'title' => $this->l('Mobile'),
-                'align' => 'center',
+                'align' => 'left',
                 'callback' => 'makePhoneCall'
             )
         );
@@ -104,7 +104,7 @@ class AdminKeyyoController extends ModuleAdminController
 
         $keyyo_link = $display_message . ' <a href="' . Context::getContext()->link->getAdminLink('AdminKeyyo');
         $keyyo_link .= '&ajax=1&action=KeyyoCall';
-        $keyyo_link .= '&CALLE=' . $phoneNumber;
+        $keyyo_link .= '&CALLEE=' . $phoneNumber;
         $keyyo_link .= '&CALLE_NAME=' . $params['lastname'] . '_' . $params['firstname'];
         $keyyo_link .= '" class="keyyo_link">' . $phoneNumber . '</a>';
 
@@ -140,8 +140,11 @@ class AdminKeyyoController extends ModuleAdminController
 
     public function ajaxProcessKeyyoCall()
     {
+//        $account = '33430966096';
+//        $passsip = 'vLPPi6L5Lv';
+        
         $account = $this->getKeyyoCaller();
-        $calle = Tools::getValue('CALLE');
+        $callee = Tools::getValue('CALLEE');
         $calle_name = Tools::getValue('CALLE_NAME');
 
         if (!$account) {
@@ -149,17 +152,30 @@ class AdminKeyyoController extends ModuleAdminController
             die($return);
         }
 
-        if (!$calle || !$calle_name) {
+        if (!$callee || !$calle_name) {
             $return = Tools::jsonEncode(array('msg' => 'Il manque une information pour composer le numéro.'));
             die($return);
         } else {
             $keyyo_link = 'https://ssl.keyyo.com/makecall.html?ACCOUNT=' . $account;
-            $keyyo_link .= '&CALLEE=' . $calle;
+            $keyyo_link .= '&CALLEE=' . $callee;
             $keyyo_link .= '&CALLE_NAME=' . $calle_name;
+
+//            $ch = curl_init();
+//
+//            curl_setopt($ch, CURLOPT_URL, $keyyo_link);
+//            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
+//            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+//            curl_setopt($ch, CURLOPT_USERPWD, $account . ":" . $passsip);
+//            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+//
+//            $fp = curl_exec($ch);
+//            curl_close($ch);
+//
+//            die($fp);
 
             $fp = fopen($keyyo_link, 'r');
             if ($fp) {
-                $return = Tools::jsonEncode(array('msg' => 'Appel du ' . $calle . ' en cours.'));
+                $return = Tools::jsonEncode(array('msg' => 'Appel du ' . $callee . ' en cours.'));
                 die($return);
             } else {
                 $return = Tools::jsonEncode(array('msg' => 'Problème lors de l\'appel.'));
@@ -172,7 +188,7 @@ class AdminKeyyoController extends ModuleAdminController
     {
         $pattern = str_split(Configuration::get('KEYYO_NUMBER_FILTER'));
         $number = str_replace($pattern, '', $number);
-        if ($number[0] != 0) {
+        if (substr($number, 0, 1) != '0') {
             $number = '0' . $number;
         }
 

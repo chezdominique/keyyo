@@ -197,86 +197,7 @@ class Keyyo extends Module
             $this->html .= $this->displayConfirmation($this->l('Votre numéro de compte KEYYO est le ' . $keyyo_caller));
         }
 
-        $keyyo_account = Configuration::get('KEYYO_ACCOUNT');
-        if (!$keyyo_account) {
-            $this->html .= $this->displayError($this->l('Veuillez entrer votre numéro de compte KEYYO'));
-        }
-
-        $this->postProcess();
-        $this->displayForm();
-
         return $this->html;
-    }
-
-    private function postProcess()
-    {
-        if (Tools::isSubmit('submitUpdate')) {
-            $keyyo_account = Tools::getValue('keyyo_account');
-
-            $pattern = '/^33[0-9]{9}$/';
-            if (Validate::isString($keyyo_account) &&
-                preg_match($pattern, $keyyo_account)
-            ) {
-                Configuration::updateValue('KEYYO_ACCOUNT', $keyyo_account);
-            } else {
-                $this->errors[] = 'Le numero n\'est pas au bon format.';
-            }
-
-
-            if ($this->errors) {
-                $this->html .= $this->displayError(implode($this->errors, '<br />'));
-            } else {
-                $this->html .= $this->displayConfirmation($this->l('Paramètres mis à jour'));
-            }
-        }
-    }
-
-    private function displayForm()
-    {
-        $this->html .= $this->generateForm();
-    }
-
-    private function generateForm()
-    {
-        $inputs = array();
-        $inputs[] = array(
-            'type' => 'text',
-            'label' => $this->l('Compte par défaut KEYYO.'),
-            'name' => 'keyyo_account',
-            'desc' => 'Veuillez entrer le numéro KEYYO par défaut. (33 suivi des 9 chiffres)',
-            'lang' => false
-        );
-        $fields_form = array(
-            'form' => array(
-                'legend' => array(
-                    'title' => $this->l('Settings'),
-                    'icon' => 'icon-cogs'
-                ),
-                'input' => $inputs,
-                'submit' => array(
-                    'title' => $this->l('Save'),
-                    'class' => 'btn btn-default pull-right',
-                    'name' => 'submitUpdate'
-                )
-            )
-        );
-
-        $helper = new HelperForm();
-        $helper->submit_action = 'submitUpdate';
-        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
-            . '&configure=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
-        $helper->token = Tools::getAdminTokenLite('AdminModules');
-        $helper->tpl_vars = array(
-            'fields_value' => $this->getConfig()
-        );
-        return $helper->generateForm(array($fields_form));
-    }
-
-    private function getConfig()
-    {
-        return array(
-            'keyyo_account' => Configuration::get('KEYYO_ACCOUNT')
-        );
     }
 
     public function hookDisplayBackOfficeHeader()
@@ -292,12 +213,12 @@ class Keyyo extends Module
 
     public function hookDisplayLeftColumn($params)
     {
-        if ($this->context->customer->id == 2) {
-            $lien = '?account=33123456789&caller=33987654321&calle=123456987&type=SETUP';
-            $this->context->smarty->assign(array('lien' => $lien));
-            return $this->display(__FILE__, 'notificationsKeyyo.tpl');
-        }
-        return false;
+//            Lien pour la notification de KEYYO, uniquement pour test
+
+//            $lien = '?account=33123456789&caller=33987654321&calle=123456987&type=SETUP';
+//            $this->context->smarty->assign(array('lien' => $lien));
+//            return $this->display(__FILE__, 'notificationsKeyyo.tpl');
+
     }
 
 }

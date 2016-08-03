@@ -1,0 +1,4 @@
+Il faut copier coller ce fichier dans le répertoire /controllers de prestashop
+
+
+33430966096
