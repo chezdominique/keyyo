@@ -27,7 +27,6 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  * International Registred Trademark & Property of PrestaShop SA
  */
-
 //require_once(dirname(__FILE__) . '/../../classes/KeyyoClass.php');
 
 
@@ -172,6 +171,11 @@ class AdminKeyyoController extends ModuleAdminController
     private function sanityzePhoneNumber($number)
     {
         $pattern = str_split(Configuration::get('KEYYO_NUMBER_FILTER'));
-        return str_replace($pattern, '', $number);
+        $number = str_replace($pattern, '', $number);
+        if ($number[0] != 0) {
+            $number = '0' . $number;
+        }
+
+        return $number;
     }
 }
