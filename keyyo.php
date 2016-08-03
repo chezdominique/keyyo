@@ -36,7 +36,8 @@ class Keyyo extends Module
     /* Set default configuration values here */
     protected $config = array(
         'KEYYO_ACCOUNT' => '', // Compte par defaut KEYYO
-        'KEYYO_NUMBER_FILTER' => ' .-_+' // Supprime les caractères suivant des numéros de téléphone
+        'KEYYO_NUMBER_FILTER' => ' .-_+', // Supprime les caractères suivant des numéros de téléphone
+        'KEYYO_URL' => 'https://ssl.keyyo.com/makecall.html'
     );
 
     public function __construct()
@@ -108,7 +109,7 @@ class Keyyo extends Module
 
     public function createNotificationKeyyoTable()
     {
-        $sql = 'CREATE TABLE `'._DB_PREFIX_.$this->tableName.'` (
+        $sql = 'CREATE TABLE `' . _DB_PREFIX_ . $this->tableName . '` (
             `id_notification_keyyo` INT (12) NOT NULL AUTO_INCREMENT,
             `account` INT NULL,
             `calle` INT NULL,
@@ -128,7 +129,7 @@ class Keyyo extends Module
             `type` VARCHAR (16) NULL,
             `id_employee` INT (12),
             PRIMARY KEY (`id_notification_keyyo`)
-        ) ENGINE = ' ._MYSQL_ENGINE_;
+        ) ENGINE = ' . _MYSQL_ENGINE_;
 
         if (!Db::getInstance()->execute($sql)) {
             return false;
@@ -138,7 +139,7 @@ class Keyyo extends Module
 
     private function removeNotificationKeyyoTable()
     {
-        if(!Db::getInstance()->Execute('DROP TABLE `'._DB_PREFIX_.$this->tableName.'`'))
+        if (!Db::getInstance()->Execute('DROP TABLE `' . _DB_PREFIX_ . $this->tableName . '`'))
             return false;
         return true;
     }
@@ -197,7 +198,79 @@ class Keyyo extends Module
             $this->html .= $this->displayConfirmation($this->l('Votre numéro de compte KEYYO est le ' . $keyyo_caller));
         }
 
+        $this->postProcess();
+        $this->displayForm();
+
         return $this->html;
+    }
+
+    private function postProcess()
+    {
+        if (Tools::isSubmit('submitConfiguration')) {
+            $keyyo_url = Tools::getValue('keyyo_url');
+            if (Validate::isString($keyyo_url)) {
+                Configuration::updateValue('KEYYO_URL', $keyyo_url);
+            } else {
+                $this->errors[] = $this->l('Le format de l\'adresse n\'est pas correct');
+            }
+        }
+
+        // Error handling
+        if ($this->errors) {
+            $this->html .= $this->displayError(implode($this->errors, '<br />'));
+        } else {
+            $this->html .= $this->displayConfirmation($this->l('Paramètres mis à jour'));
+        }
+    }
+
+    private function displayForm()
+    {
+        $this->html .= $this->generateForm();
+    }
+
+    private function generateForm()
+    {
+        $inputs = array();
+        $inputs[] = array(
+            'type' => 'text',
+            'label' => $this->l('URL vers le serveur KEYYO'),
+            'name' => 'keyyo_url',
+            'desc' => $this->l('Veuillez entrer l\'url vers le serveur Keyyo ( https://ssl.keyyo.com/makecall.html ou 
+            http://www.chez-dominique.fr/makecall.php )'),
+            'lang' => false
+        );
+        $fields_form = array(
+            'form' => array(
+                'legend' => array(
+                    'title' => $this->l('Paramètres'),
+                    'icon' => 'icon-cogs'
+                ),
+                'input' => $inputs,
+                'submit' => array(
+                    'title' => $this->l('Enregistrer'),
+                    'class' => 'btn btn-default pull-right',
+                    'name' => 'submitConfiguration'
+                )
+            )
+        );
+
+        $helper = new HelperForm();
+        $helper->submit_action = 'submitConfiguration';
+        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
+            . '&configure=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->tpl_vars = array(
+            'fields_value' => $this->getConfig()
+        );
+        return $helper->generateForm(array($fields_form));
+
+    }
+
+    private function getConfig()
+    {
+        return array(
+            'keyyo_url' => Configuration::get('KEYYO_URL')
+        );
     }
 
     public function hookDisplayBackOfficeHeader()

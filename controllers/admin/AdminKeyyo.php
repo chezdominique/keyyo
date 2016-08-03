@@ -142,7 +142,8 @@ class AdminKeyyoController extends ModuleAdminController
     {
 //        $account = '33430966096';
 //        $passsip = 'vLPPi6L5Lv';
-        
+
+        $keyyo_url = Configuration::get('KEYYO_URL');
         $account = $this->getKeyyoCaller();
         $callee = Tools::getValue('CALLEE');
         $calle_name = Tools::getValue('CALLE_NAME');
@@ -156,7 +157,7 @@ class AdminKeyyoController extends ModuleAdminController
             $return = Tools::jsonEncode(array('msg' => 'Il manque une information pour composer le numéro.'));
             die($return);
         } else {
-            $keyyo_link = 'https://ssl.keyyo.com/makecall.html?ACCOUNT=' . $account;
+            $keyyo_link = $keyyo_url.'?ACCOUNT=' . $account;
             $keyyo_link .= '&CALLEE=' . $callee;
             $keyyo_link .= '&CALLE_NAME=' . $calle_name;
 
