@@ -25,6 +25,7 @@
  * International Registred Trademark & Property of PrestaShop SA
  */
 $(document).ready(function(e){
+    $('.keyyo_link').parent().attr('onclick','').css('cursor','text');
     $('.keyyo_link').click(function(e){
         e.preventDefault();
         var link = $(this).attr('href');

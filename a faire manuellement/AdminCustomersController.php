@@ -45,10 +45,6 @@ class AdminCustomersControllerCore extends AdminController
 
 		$this->allow_export = false;
 
-		// Ajout pour les appels AJAX du module KEYYO
-		$this->addJquery();
-        $this->addJS(_PS_MODULE_DIR_ . 'keyyo/views/js/adminkeyyo.js');
-
 		$this->addRowAction('edit');
 		$this->addRowAction('view');
 		$this->addRowAction('delete');
@@ -180,6 +176,10 @@ class AdminCustomersControllerCore extends AdminController
 		$this->shopShareDatas = Shop::SHARE_CUSTOMER;
 
 		parent::__construct();
+
+        // Ajout pour les appels AJAX du module KEYYO
+        $this->addJquery();
+        $this->addJS(_PS_MODULE_DIR_ . 'keyyo/views/js/adminkeyyo.js');
 
 		// Check if we can add a customer
 		if (Shop::isFeatureActive() && (Shop::getContext() == Shop::CONTEXT_ALL || Shop::getContext() == Shop::CONTEXT_GROUP))

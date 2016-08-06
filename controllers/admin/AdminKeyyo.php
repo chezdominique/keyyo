@@ -47,8 +47,6 @@ class AdminKeyyoController extends ModuleAdminController
         $this->explicitSelect = false;
         $this->addRowAction('afficher');
         $this->addCSS(_PS_MODULE_DIR_ . 'keyyo/views/css/adminkeyyo.css');
-        $this->addJquery();
-        $this->addJS(_PS_MODULE_DIR_ . 'keyyo/views/js/adminkeyyo.js');
         $this->list_no_link = true;
 
         $this->fields_list = array(
@@ -82,6 +80,8 @@ class AdminKeyyoController extends ModuleAdminController
         );
 
         parent::__construct();
+        $this->addJquery();
+        $this->addJS(_PS_MODULE_DIR_ . 'keyyo/views/js/adminkeyyo.js');
 
         $this->_select =
             'a.id_customer, a.firstname, a.lastname, ad.address1, ad.postcode, ad.city, ad.phone, ad.phone_mobile';
