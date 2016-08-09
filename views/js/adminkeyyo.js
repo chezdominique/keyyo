@@ -41,4 +41,23 @@ $(document).ready(function(e){
                 alert('Erreur : KEYYO refuse l\'appel.');
             });
     });
+
+        // function get_fb_complete(){
+        //     $('#footer').append('<li>get_fb() ran</li>');
+        //     var feedback = $.ajax({
+        //         type: "POST",
+        //         url: "feedback.php",
+        //         async: false
+        //     }).complete(function(){
+        //         setTimeout(function(){get_fb_complete();}, 1000);
+        //     }).responseText;
+        //
+        //     $('div.feedback-box-complete').html('complete feedback');
+        // }
+        //
+        // $(function(){
+        //     get_fb_complete();
+        // });
+
+
 });

@@ -52,7 +52,7 @@ class Keyyo extends Module
         $this->version = '1.0.0';
         $this->author = 'Dominique';
         $this->need_instance = 0;
-        $this->controllers = array('notificationskeyyo', 'presentationappel');
+        $this->controllers = array('notificationskeyyo');
 
         $this->bootstrap = true;
 
@@ -73,6 +73,7 @@ class Keyyo extends Module
             !$this->registerHook('displayHeader') or
             !$this->registerHook('displayBackOfficeHeader') or
             !$this->registerHook('displayLeftColumn') or
+//            !$this->registerHook('displayBackOfficeTop') or
             !$this->createNotificationKeyyoTable()
         ) {
             return false;
@@ -291,7 +292,15 @@ class Keyyo extends Module
 //            $lien = '?account=33123456789&caller=33987654321&calle=123456987&type=SETUP';
 //            $this->context->smarty->assign(array('lien' => $lien));
 //            return $this->display(__FILE__, 'notificationsKeyyo.tpl');
+    }
 
+    public function hookDisplayBackOfficeTop()
+    {
+        $checkbox = '<a id="checkboxAppelsKeyyo" class="list-action-enable action-disabled" 
+                        href="index.php?controller=AdminEmployees" title="Activé">
+	                 <i class="icon-check hidden"></i><i class="icon-remove"></i></a>';
+
+        return $checkbox;
     }
 
 }

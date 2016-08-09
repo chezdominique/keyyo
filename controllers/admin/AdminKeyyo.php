@@ -27,8 +27,6 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  * International Registred Trademark & Property of PrestaShop SA
  */
-//require_once(dirname(__FILE__) . '/../../classes/KeyyoClass.php');
-
 
 class AdminKeyyoController extends ModuleAdminController
 {
@@ -170,4 +168,11 @@ class AdminKeyyoController extends ModuleAdminController
 
         return $number;
     }
+
+
+    public function ajaxProcessAffichageAppel()
+    {
+        return Tools::jsonEncode(array('title' => 'Appel'));
+    }
+
 }
