@@ -14,13 +14,19 @@ class keyyoNotificationskeyyoModuleFrontController extends ModuleFrontController
 
     public function postProcess()
     {
+
+//        $url['url'] = $this->context->smarty->tpl_vars['come_from']->value;
+//        if (!Db::getInstance()->insert($this->module->tableName, $url ));
+
         $values_notification = array();
-        $notification_names = array('account', 'caller', 'calle', 'callref', 'type', 'version', 'dref', 'drefreplace',
+        $notification_names = array('account', 'caller', 'callee', 'callref', 'type', 'version', 'dref', 'drefreplace',
             'sessionid', 'isacd', 'redirectingnumber', 'tsms');
 
-        foreach ($notification_names as $value) {
-            $values_notification[$value] = Tools::htmlentitiesUTF8(Tools::getValue($value));
-            $this->errors[] = Tools::displayError($value . ' : ' . $values_notification[$value]);
+
+        foreach ($notification_names as $name) {
+
+            $values_notification[$name] = Tools::getValue($name);
+            $this->errors[] = Tools::displayError($name . ' : ' . $values_notification[$name]);
         }
 
         if(!Db::getInstance()->insert($this->module->tableName, $values_notification)) {

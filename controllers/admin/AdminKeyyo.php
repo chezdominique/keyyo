@@ -98,7 +98,7 @@ class AdminKeyyoController extends ModuleAdminController
      */
     public function makePhoneCall($number, $params)
     {
-        $phoneNumber = $this->sanityzePhoneNumber($number);
+        $phoneNumber = $this->sanitizePhoneNumber($number);
         $ln = strlen($phoneNumber);
         $display_message = ($ln != 10 && $ln > 0) ? '<i class="icon-warning text-danger"></i>' : '';
 
@@ -160,7 +160,7 @@ class AdminKeyyoController extends ModuleAdminController
         }
     }
 
-    private function sanityzePhoneNumber($number)
+    private function sanitizePhoneNumber($number)
     {
         $pattern = str_split(Configuration::get('KEYYO_NUMBER_FILTER'));
         $number = str_replace($pattern, '', $number);

@@ -1,3 +1,7 @@
 .icon-AdminKeyyo:before{
     content: '';
 }
+
+.keyyo_link {
+    display: block;
+}

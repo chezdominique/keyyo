@@ -52,7 +52,7 @@ class Keyyo extends Module
         $this->version = '1.0.0';
         $this->author = 'Dominique';
         $this->need_instance = 0;
-        $this->controllers = array('notificationskeyyo');
+        $this->controllers = array('notificationskeyyo', 'presentationappel');
 
         $this->bootstrap = true;
 
@@ -111,23 +111,23 @@ class Keyyo extends Module
     {
         $sql = 'CREATE TABLE `' . _DB_PREFIX_ . $this->tableName . '` (
             `id_notification_keyyo` INT (12) NOT NULL AUTO_INCREMENT,
-            `account` INT NULL,
-            `calle` INT NULL,
-            `caller` INT NULL,
+            `account` VARCHAR (32) NULL,
+            `callee` VARCHAR (32) NULL,
+            `caller` VARCHAR (32) NULL,
             `calle_name` VARCHAR (64) NULL,
             `callref` VARCHAR (64) NULL,
             `dref` VARCHAR (32) NULL,
             `drefreplace` VARCHAR (32) NULL,
-            `isacd` BOOLEAN NULL,
+            `isacd` CHAR (2) NULL,
             `msg` VARCHAR (64) NULL,
             `profil` VARCHAR (64) NULL,
-            `record` BOOLEAN NULL,
-            `redirectingnumber` INT (12) NULL,
+            `record` CHAR (2) NULL,
+            `redirectingnumber` VARCHAR (32) NULL,
             `sessionid` VARCHAR (64) NULL,
-            `version` INT (12) NULL,
-            `tsms` VARCHAR (13) NULL,
-            `type` VARCHAR (16) NULL,
-            `id_employee` INT (12),
+            `version` VARCHAR (32) NULL,
+            `tsms` VARCHAR (32) NULL,
+            `type` VARCHAR (32) NULL,
+            `id_employee` VARCHAR (32) NULL,
             PRIMARY KEY (`id_notification_keyyo`)
         ) ENGINE = ' . _MYSQL_ENGINE_;
 
@@ -207,7 +207,7 @@ class Keyyo extends Module
     private function postProcess()
     {
         if (Tools::isSubmit('submitConfiguration')) {
-            $keyyo_url = Tools::getValue('keyyo_url');
+            $keyyo_url = trim(Tools::getValue('keyyo_url'));
             if (Validate::isString($keyyo_url)) {
                 Configuration::updateValue('KEYYO_URL', $keyyo_url);
             } else {

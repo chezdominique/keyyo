@@ -45,10 +45,6 @@ class AdminCustomersControllerCore extends AdminController
 
 		$this->allow_export = false;
 
-		// Ajout pour les appels AJAX du module KEYYO
-		$this->addJquery();
-        $this->addJS(_PS_MODULE_DIR_ . 'keyyo/views/js/adminkeyyo.js');
-
 		$this->addRowAction('edit');
 		$this->addRowAction('view');
 		$this->addRowAction('delete');
@@ -82,7 +78,7 @@ class AdminCustomersControllerCore extends AdminController
 			WHERE g.id_customer = a.id_customer
 			ORDER BY c.date_add DESC
 			LIMIT 1
-		) as connect, (SELECT CONCAT(b.phone, " ", b.phone_mobile) as phone FROM '._DB_PREFIX_.'address b WHERE b.id_customer = a.id_customer LIMIT 1) as phone
+		) as connect, (SELECT CONCAT(b.phone, ":", b.phone_mobile) as phone FROM '._DB_PREFIX_.'address b WHERE b.id_customer = a.id_customer LIMIT 1) as phone
 		'; // added
 		$this->_join = 'LEFT JOIN '._DB_PREFIX_.'gender_lang gl ON (a.id_gender = gl.id_gender AND gl.id_lang = '.(int)$this->context->language->id.')';
 		$this->fields_list = array(
@@ -127,8 +123,7 @@ class AdminCustomersControllerCore extends AdminController
 				'type' => 'text',
 				'orderby' => false,
 				'havingFilter' => true,
-				'callback' => 'makePhoneCall'
-
+				'callback' => 'makePhoneCall' // Keyyo
 			),
 
 			'total_spent' => array(
@@ -180,6 +175,11 @@ class AdminCustomersControllerCore extends AdminController
 		$this->shopShareDatas = Shop::SHARE_CUSTOMER;
 
 		parent::__construct();
+
+        // Ajout pour les appels AJAX du module KEYYO
+        $this->addJquery();
+        $this->addJS(_PS_MODULE_DIR_ . 'keyyo/views/js/adminkeyyo.js');
+        $this->addCSS(_PS_MODULE_DIR_ . 'keyyo/views/css/adminkeyyo.css');
 
 		// Check if we can add a customer
 		if (Shop::isFeatureActive() && (Shop::getContext() == Shop::CONTEXT_ALL || Shop::getContext() == Shop::CONTEXT_GROUP))
@@ -1421,26 +1421,24 @@ class AdminCustomersControllerCore extends AdminController
      */
     public function makePhoneCall($number, $params)
     {
+        $keyyo_link ='';
+        $phoneNumbers = explode(':', $number);
+        foreach ($phoneNumbers as $phoneNumber) {
+            $NumberK = $this->sanitizePhonenumber($phoneNumber);
+            $ln = strlen($NumberK);
 
-        $phoneNumber = $this->sanityzePhoneNumber($number);
-        $ln = strlen($phoneNumber);
-		// if ($ln != 10 && $ln > 0) {
-		// 	$n = split(' ', $number);
-		// 	ddd($n);
-		// }
+            $display_message = ($ln != 10 && $ln > 0) ? '<i class="icon-warning text-danger"></i>' : '';
 
-        $display_message = ($ln != 10 && $ln > 0) ? '<i class="icon-warning text-danger"></i>' : '';
-
-        $keyyo_link = $display_message . ' <a href="' . Context::getContext()->link->getAdminLink('AdminCustomers');
-        $keyyo_link .= '&ajax=1&action=KeyyoCall';
-        $keyyo_link .= '&CALLEE=' . $phoneNumber;
-        $keyyo_link .= '&CALLE_NAME=' . $params['lastname'] . '_' . $params['firstname'];
-        $keyyo_link .= '" class="keyyo_link">' . $phoneNumber . '</a>';
-
+            $keyyo_link .= $display_message . ' <a href="' . Context::getContext()->link->getAdminLink('AdminCustomers');
+            $keyyo_link .= '&ajax=1&action=KeyyoCall';
+            $keyyo_link .= '&CALLEE=' . $NumberK;
+            $keyyo_link .= '&CALLE_NAME=' . $params['lastname'] . '_' . $params['firstname'];
+            $keyyo_link .= '" class="keyyo_link">' . $NumberK . '</a>';
+        }
         return $keyyo_link;
     }
 
-    private function sanityzePhoneNumber($number)
+    private function sanitizePhoneNumber($number)
     {
         $pattern = str_split(Configuration::get('KEYYO_NUMBER_FILTER'));
         $number = str_replace($pattern, '', $number);
@@ -1471,6 +1469,7 @@ class AdminCustomersControllerCore extends AdminController
             $keyyo_link = $keyyo_url . '?ACCOUNT=' . $account;
             $keyyo_link .= '&CALLEE=' . $callee;
             $keyyo_link .= '&CALLE_NAME=' . $calle_name;
+
 
             $fp = fopen($keyyo_link, 'r');
             $buffer = fgets($fp, 4096);
