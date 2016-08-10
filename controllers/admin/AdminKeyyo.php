@@ -175,35 +175,35 @@ class AdminKeyyoController extends ModuleAdminController
         // Verifier si il y a une heure de demande et quel heure si pas d'heure, renvoyer desuite l'heure actuelle
         // si la demande est plus ancienne que
 
-        $isEnabled = Tools::getValue('isEnabled');
         $listNumeroAccepte = array('33430966996'); // TODO faire le formulaire de numero à cocher dans employé
 
         $heureLastNotificationCient = Tools::getValue('heureLN');
         $lastCall = $this->getHeureLastCall();
-
         $heureLastNotificationServeur = $lastCall['tsms'];
-
         $lc = substr($lastCall['caller'], 2);
-        ddd($lc);
+
 
         if ($this->newDisplay($heureLastNotificationCient, $heureLastNotificationServeur)) {
-            $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'address WHERE `phone` LIKE "%' . $lc . '%" ';
-            $req = Db::getInstance()->executeS($sql);
+            $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'address WHERE `phone` LIKE "%' . $lc . '%" ORDER BY `date_upd` ASC';
+            $req = Db::getInstance()->getRow($sql);
 
-            // TODO reprendre ici
 
-            die(Tools::jsonEncode(array('heureServeur' => 'inNewCall')));
+
+            $notif = Tools::jsonEncode(array(
+                'heureClient' => $heureLastNotificationServeur,
+                'heureServeur' => $heureLastNotificationServeur,
+                'show' => 'true'
+            ));
+            die($notif);
         }
 
 
         $notif = Tools::jsonEncode(array(
-            'isEnabled' => $isEnabled,
-            'heureClient' => $heureLastNotificationCient,
-            'heureServeur' => $heureLastNotificationServeur
-
+            'heureClient' => $heureLastNotificationServeur,
+            'heureServeur' => $heureLastNotificationServeur,
+            'show' => 'false'
         ));
-
-        die(Tools::jsonEncode(array('heureServeur' => 'null')));
+        die($notif);
     }
 
 
@@ -231,8 +231,7 @@ class AdminKeyyoController extends ModuleAdminController
     private function newDisplay($heureLastNotificationCient, $heureLastNotificationServeur)
     {
         if ($heureLastNotificationCient == 'null' or $heureLastNotificationCient == $heureLastNotificationServeur) {
-//            die( Tools::jsonEncode(array('heureServeur' => $heureLastNotificationServeur)));
-            die(Tools::jsonEncode(array('heureServeur' => '1470823126612'))); // TODO renvoie l'avant dernier appel pour test
+            return false;
         }
         return true;
     }

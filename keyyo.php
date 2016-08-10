@@ -70,10 +70,9 @@ class Keyyo extends Module
             !$this->installConfig() or
             !$this->alterEmployeeTable() or
             !$this->createTabs() or
-            !$this->registerHook('displayHeader') or
             !$this->registerHook('displayBackOfficeHeader') or
-            !$this->registerHook('displayLeftColumn') or
             !$this->registerHook('displayBackOfficeTop') or
+            !$this->registerHook('displayLeftColumn') or
             !$this->createNotificationKeyyoTable()
         ) {
             return false;
@@ -276,16 +275,28 @@ class Keyyo extends Module
 
     public function hookDisplayBackOfficeHeader()
     {
+        $this->context->controller->addCSS($this->_path . 'views/css/remodal.css', 'all');
+        $this->context->controller->addCSS($this->_path . 'views/css/remodal-default-theme.css', 'all');
         $this->context->controller->addCSS($this->_path . 'views/css/adminkeyyo.css', 'all');
-        $this->context->controller->addJS($this->_path . 'views/js/jquery.cookie.js');
+        $this->context->controller->addJS($this->_path . 'views/js/jquery.cookie.js', 'all');
+        $this->context->controller->addJS($this->_path . 'views/js/remodal.js', 'all');
         $this->context->controller->addJS($this->_path . 'views/js/adminkeyyo.js', 'all');
+
+        $modal = '<div class="remodal" data-remodal-id="modal">
+              <button data-remodal-action="close" class="remodal-close"></button>
+              <h1>Remodal</h1>
+              <p>
+                Responsive, lightweight, fast, synchronized with CSS animations, fully customizable modal window plugin with declarative configuration and hash tracking.
+              </p>
+              <br>
+              <button data-remodal-action="cancel" class="remodal-cancel">Cancel</button>
+              <button data-remodal-action="confirm" class="remodal-confirm">OK</button>
+            </div>';
+
+        return $modal;
+
     }
 
-    public function hookDisplayHeader()
-    {
-//        $this->context->controller->addCSS($this->_path . 'views/css/adminkeyyo.css', 'all');
-//        $this->context->controller->addJS($this->_path . 'views/js/adminkeyyo.js', 'all');
-    }
 
     public function hookDisplayLeftColumn($params)
     {
@@ -298,8 +309,7 @@ class Keyyo extends Module
 
     public function hookDisplayBackOfficeTop()
     {
-        $checkbox = '<bouton id="checkboxAppelsKeyyo" class="list-action-enable action-disabled" url="' . Context::getContext()->link->getAdminLink('AdminKeyyo') . '&ajax=1&action=AffichageAppels" title="disabled" heureLastNotif="null"><i id="notifKeyyoCheck" class="icon-check hidden"></i><i id="notifKeyyoRemove" class="icon-remove"></i>  Notification d\'appels</bouton>';
-
+        $checkbox = '<bouton id="checkboxAppelsKeyyo" class="list-action-enable action-disabled" url="' . Context::getContext()->link->getAdminLink('AdminKeyyo') . '&ajax=1&action=AffichageAppels" title="disabled" heureLastNotif="1470823219600"><i id="notifKeyyoCheck" class="icon-check hidden"></i><i id="notifKeyyoRemove" class="icon-remove"></i>  Notification d\'appels</bouton>';
         return $checkbox;
     }
 

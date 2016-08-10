@@ -26,8 +26,9 @@
  */
 $(document).ready(function (e) {
 
-    var isEnabled = 'disabled';
 
+    var isEnabled = 'disabled';
+    var modalKeyyo = $('[data-remodal-id=modal]').remodal();
     $('.keyyo_link').parent().attr('onclick', '').css('cursor', 'text');
     $('.keyyo_link').click(function (e) {
         e.preventDefault();
@@ -44,9 +45,6 @@ $(document).ready(function (e) {
                 alert('Erreur : KEYYO refuse l\'appel.');
             });
     });
-
-
-
 
     function toggleBouton() {
         $('#notifKeyyoCheck').toggleClass('hidden');
@@ -93,18 +91,16 @@ $(document).ready(function (e) {
     }
 
     function displayNotification(link, data) {
-        if (typeof data.isEnabled != 'undefined') {
-            isEnabled = data.isEnabled;
-        }
 
-        if (typeof data.heureServeur != 'null') {
+        if ( data.show == 'true') {
             heureLastNotif = data.heureServeur;
             $("#checkboxAppelsKeyyo").attr('heureLastNotif', heureLastNotif);
+            modalKeyyo.open();
         }
 
         setTimeout(function () {
             get_fb_complete(link);
-        }, 1000);
+        }, 5000);
     }
 
 
