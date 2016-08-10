@@ -42,6 +42,14 @@ $(document).ready(function(e){
             });
     });
 
+
+    $(document).ready(function() {
+        $('#mytrigger').click(function(e) {
+            $('#this_to_be_opened').toggle();
+        });
+    });
+
+
         // function get_fb_complete(){
         //     $('#footer').append('<li>get_fb() ran</li>');
         //     var feedback = $.ajax({

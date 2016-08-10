@@ -73,7 +73,7 @@ class Keyyo extends Module
             !$this->registerHook('displayHeader') or
             !$this->registerHook('displayBackOfficeHeader') or
             !$this->registerHook('displayLeftColumn') or
-//            !$this->registerHook('displayBackOfficeTop') or
+            !$this->registerHook('displayBackOfficeTop') or
             !$this->createNotificationKeyyoTable()
         ) {
             return false;
@@ -296,11 +296,11 @@ class Keyyo extends Module
 
     public function hookDisplayBackOfficeTop()
     {
-        $checkbox = '<a id="checkboxAppelsKeyyo" class="list-action-enable action-disabled"
-                        href="index.php?controller=AdminEmployees" title="Activé">
-	                 <i class="icon-check hidden"></i><i class="icon-remove"></i></a>';
-
-        return $checkbox;
+//        $checkbox = '<a id="checkboxAppelsKeyyo" class="list-action-enable action-disabled"
+//                        href="index.php?controller=AdminEmployees" title="Activé">
+//	                 <i class="icon-check hidden"></i><i class="icon-remove"></i></a>';
+//
+//        return $checkbox;
     }
 
 }
