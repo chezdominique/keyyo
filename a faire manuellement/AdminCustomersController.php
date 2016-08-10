@@ -1424,7 +1424,7 @@ class AdminCustomersControllerCore extends AdminController
         $keyyo_link ='';
         $phoneNumbers = explode(':', $number);
         foreach ($phoneNumbers as $phoneNumber) {
-            $NumberK = $this->sanitizePhonenumber($phoneNumber);
+            $NumberK = $this->sanitizePhoneNumber($phoneNumber);
             $ln = strlen($NumberK);
 
             $display_message = ($ln != 10 && $ln > 0) ? '<i class="icon-warning text-danger"></i>' : '';
