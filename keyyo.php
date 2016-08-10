@@ -37,7 +37,7 @@ class Keyyo extends Module
     protected $config = array(
         'KEYYO_ACCOUNT' => '', // Compte par defaut KEYYO
         'KEYYO_NUMBER_FILTER' => ' .-_+', // Supprime les caractères suivant des numéros de téléphone
-        'KEYYO_URL' => 'https://ssl.keyyo.com/makecall.html'
+        'KEYYO_URL' => 'http://www.chez-dominique.fr/makecall.php'
     );
 
     public function __construct()
@@ -58,7 +58,7 @@ class Keyyo extends Module
 
         parent::__construct();
 
-        $this->displayName = $this->l('Module non officiel pour la téléphonie KEYYO');
+        $this->displayName = $this->l('Module pour la téléphonie KEYYO');
         $this->description = $this->l('Installe un lien permettant les appels via KEYYO.');
         $this->confirmUninstall = $this->l('Etes vous sur ?');
         $this->tabName = 'Keyyo';
@@ -193,7 +193,7 @@ class Keyyo extends Module
     {
         $keyyo_caller = $this->context->employee->getKeyyoCaller();
         if (!$keyyo_caller) {
-            $this->html .= $this->displayError($this->l('Veuillez configurer votre numéro d\'appelé 
+            $this->html .= $this->displayError($this->l('Veuillez configurer votre numéro d\'appelé
             dans l\'onglet Administration>Employés '));
         } else {
             $this->html .= $this->displayConfirmation($this->l('Votre numéro de compte KEYYO est le ' . $keyyo_caller));
@@ -236,7 +236,7 @@ class Keyyo extends Module
             'type' => 'text',
             'label' => $this->l('URL vers le serveur KEYYO'),
             'name' => 'keyyo_url',
-            'desc' => $this->l('Veuillez entrer l\'url vers le serveur Keyyo ( https://ssl.keyyo.com/makecall.html ou 
+            'desc' => $this->l('Veuillez entrer l\'url vers le serveur Keyyo ( https://ssl.keyyo.com/makecall.html ou
             http://www.chez-dominique.fr/makecall.php )'),
             'lang' => false
         );
@@ -296,7 +296,7 @@ class Keyyo extends Module
 
     public function hookDisplayBackOfficeTop()
     {
-        $checkbox = '<a id="checkboxAppelsKeyyo" class="list-action-enable action-disabled" 
+        $checkbox = '<a id="checkboxAppelsKeyyo" class="list-action-enable action-disabled"
                         href="index.php?controller=AdminEmployees" title="Activé">
 	                 <i class="icon-check hidden"></i><i class="icon-remove"></i></a>';
 
