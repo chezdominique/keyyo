@@ -1,6 +1,12 @@
 <?php
 
+
+
 /*
+
+
+
+
 
 
 
@@ -8,7 +14,15 @@
 
 
 
+
+
+
+
 *
+
+
+
+
 
 
 
@@ -16,7 +30,15 @@
 
 
 
+
+
+
+
 *
+
+
+
+
 
 
 
@@ -24,7 +46,15 @@
 
 
 
+
+
+
+
 * that is bundled with this package in the file LICENSE.txt.
+
+
+
+
 
 
 
@@ -32,7 +62,15 @@
 
 
 
+
+
+
+
 * http://opensource.org/licenses/osl-3.0.php
+
+
+
+
 
 
 
@@ -40,7 +78,15 @@
 
 
 
+
+
+
+
 * obtain it through the world-wide-web, please send an email
+
+
+
+
 
 
 
@@ -48,7 +94,15 @@
 
 
 
+
+
+
+
 *
+
+
+
+
 
 
 
@@ -56,7 +110,15 @@
 
 
 
+
+
+
+
 *
+
+
+
+
 
 
 
@@ -64,7 +126,15 @@
 
 
 
+
+
+
+
 * versions in the future. If you wish to customize PrestaShop for your
+
+
+
+
 
 
 
@@ -72,7 +142,15 @@
 
 
 
+
+
+
+
 *
+
+
+
+
 
 
 
@@ -80,7 +158,15 @@
 
 
 
+
+
+
+
 *  @copyright  2007-2016 PrestaShop SA
+
+
+
+
 
 
 
@@ -88,224 +174,449 @@
 
 
 
+
+
+
+
 *  International Registered Trademark & Property of PrestaShop SA
+
+
+
+
 
 
 
 */
 
+
+
 class AdminEmployeesController extends AdminEmployeesControllerCore
+
+
 
 {
 
+
+
     public function __construct()
+
     {
+
         parent::__construct();
+
         $this->fields_list = array(
+
+
 
             'id_employee' => array('title' => $this->l('ID'), 'align' => 'center', 'class' => 'fixed-width-xs'),
 
+
+
             'firstname' => array('title' => $this->l('First Name')),
+
+
 
             'lastname' => array('title' => $this->l('Last Name')),
 
+
+
             'email' => array('title' => $this->l('Email address')),
+
+
 
             'keyyo_caller' => array('title' => $this->l('Compte Keyyo')),
 
+
+
             'profile' => array('title' => $this->l('Profile'), 'type' => 'select', 'list' => $this->profiles_array,
+
+
 
                 'filter_key' => 'pl!name', 'class' => 'fixed-width-lg'),
 
+
+
             'active' => array('title' => $this->l('Active'), 'align' => 'center', 'active' => 'status',
+
+
 
                 'type' => 'bool', 'class' => 'fixed-width-sm'),
 
+
+
         );
+
+
 
     }
 
+
+
     public function renderForm()
+
     {
+
+
 
         /** @var Employee $obj */
 
+
+
         if (!($obj = $this->loadObject(true))) {
+
+
 
             return;
 
+
+
         }
+
+
 
         $available_profiles = Profile::getProfiles($this->context->language->id);
 
+
+
         if ($obj->id_profile == _PS_ADMIN_PROFILE_ && $this->context->employee->id_profile != _PS_ADMIN_PROFILE_) {
+
             $this->errors[] = Tools::displayError('You cannot edit the SuperAdmin profile.');
+
+
 
             return AdminController::renderForm();
 
+
+
         }
 
+
+
         $this->fields_form = array(
+
             'legend' => array(
+
+
 
                 'title' => $this->l('Employees'),
 
+
+
                 'icon' => 'icon-user'
 
+
+
             ),
+
+
 
             'input' => array(
 
+
+
                 array(
+
+
 
                     'type' => 'text',
 
+
+
                     'class' => 'fixed-width-xl',
+
+
 
                     'label' => $this->l('First Name'),
 
+
+
                     'name' => 'firstname',
+
+
 
                     'required' => true
 
+
+
                 ),
+
+
 
                 array(
 
+
+
                     'type' => 'text',
+
+
 
                     'class' => 'fixed-width-xl',
 
+
+
                     'label' => $this->l('Last Name'),
+
+
 
                     'name' => 'lastname',
 
+
+
                     'required' => true
+
                 ),
+
+
 
                 array(
 
+
+
                     'type' => 'html',
+
                     'name' => 'employee_avatar',
+
+
 
                     'html_content' => '',
 
+
+
                 ),
+
+
 
                 array(
 
+
+
                     'type' => 'text',
 
+
+
                     'class' => 'fixed-width-xxl',
+
+
 
                     'prefix' => '<i class="icon-envelope-o"></i>',
 
+
+
                     'label' => $this->l('Email address'),
+
+
 
                     'name' => 'email',
 
+
+
                     'required' => true,
+
+
 
                     'autocomplete' => false
 
+
+
                 ),
+
+
 
                 array(
 
+
+
                     'type' => 'text',
+
+
 
                     'class' => 'fixed-width-xxl',
 
+
+
                     'prefix' => '<i class="icon-phone"></i>',
+
+
 
                     'label' => $this->l('Compte Keyyo'),
 
+
+
                     'name' => 'keyyo_caller',
+
+
 
                     'hint' => $this->l('Votre numéro au format international'),
 
+
+
                     'required' => false,
+
+
 
                     'autocomplete' => false
 
+
+
                 ),
+
+
 
             ),
 
+
+
         );
+
+
 
         if ($this->restrict_edition) {
 
+
+
             $this->fields_form['input'][] = array(
+
+
 
                 'type' => 'change-password',
 
+
+
                 'label' => $this->l('Password'),
+
+
 
                 'name' => 'passwd'
 
+
+
             );
+
+
 
             if (Tab::checkTabRights(Tab::getIdFromClassName('AdminModulesController'))) {
 
+
+
                 $this->fields_form['input'][] = array(
+
+
 
                     'type' => 'prestashop_addons',
 
+
+
                     'label' => 'PrestaShop Addons',
+
+
 
                     'name' => 'prestashop_addons',
 
+
+
                 );
+
             }
+
+
 
         } else {
 
+
+
             $this->fields_form['input'][] = array(
 
+
+
                 'type' => 'password',
+
                 'label' => $this->l('Password'),
+
+
 
                 'hint' => sprintf($this->l('Password should be at least %s characters long.'), Validate::ADMIN_PASSWORD_LENGTH),
 
+
+
                 'name' => 'passwd'
 
+
+
             );
+
         }
+
+
 
         $this->fields_form['input'] = array_merge($this->fields_form['input'], array(
 
+
+
             array(
+
+
 
                 'type' => 'switch',
 
+
+
                 'label' => $this->l('Subscribe to PrestaShop newsletter'),
+
+
 
                 'name' => 'optin',
 
+
+
                 'required' => false,
+
+
 
                 'is_bool' => true,
 
+
+
                 'values' => array(
 
+
+
                     array(
+
+
 
                         'id' => 'optin_on',
 
+
+
                         'value' => 1,
+
+
 
                         'label' => $this->l('Yes')
 
+
+
                     ),
+
+
 
                     array(
 
+
+
                         'id' => 'optin_off',
+
+
 
                         'value' => 0,
 
+
+
                         'label' => $this->l('No')
+
+
+
+
 
 
 
@@ -313,7 +624,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 ),
+
+
+
+
 
 
 
@@ -321,11 +640,23 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
             ),
 
 
 
+
+
+
+
             array(
+
+
+
+
 
 
 
@@ -333,7 +664,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 'label' => $this->l('Default page'),
+
+
+
+
 
 
 
@@ -341,7 +680,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 'hint' => $this->l('This page will be displayed just after login.'),
+
+
+
+
 
 
 
@@ -349,7 +696,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
             ),
+
+
+
+
 
 
 
@@ -357,7 +712,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 'type' => 'select',
+
+
+
+
 
 
 
@@ -365,7 +728,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 'name' => 'id_lang',
+
+
+
+
 
 
 
@@ -373,7 +744,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 'options' => array(
+
+
+
+
 
 
 
@@ -381,7 +760,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                     'id' => 'id_lang',
+
+
+
+
 
 
 
@@ -389,7 +776,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 )
+
+
+
+
 
 
 
@@ -397,7 +792,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
             array(
+
+
+
+
 
 
 
@@ -405,7 +808,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 'label' => $this->l('Theme'),
+
+
+
+
 
 
 
@@ -413,7 +824,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 'options' => array(
+
+
+
+
 
 
 
@@ -421,7 +840,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                     'id' => 'id',
+
+
+
+
 
 
 
@@ -429,7 +856,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 ),
+
+
+
+
 
 
 
@@ -437,7 +872,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 'hint' => $this->l('Back office theme.')
+
+
+
+
 
 
 
@@ -445,7 +888,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
             array(
+
+
+
+
 
 
 
@@ -453,7 +904,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 'label' => $this->l('Admin menu orientation'),
+
+
+
+
 
 
 
@@ -461,7 +920,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 'required' => false,
+
+
+
+
 
 
 
@@ -469,11 +936,23 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 'values' => array(
 
 
 
+
+
+
+
                     array(
+
+
+
+
 
 
 
@@ -481,7 +960,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                         'value' => 0,
+
+
+
+
 
 
 
@@ -489,7 +976,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                     ),
+
+
+
+
 
 
 
@@ -497,7 +992,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                         'id' => 'bo_menu_off',
+
+
+
+
 
 
 
@@ -505,7 +1008,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                         'label' => $this->l('Left')
+
+
+
+
 
 
 
@@ -513,11 +1024,23 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 )
 
 
 
+
+
+
+
             )
+
+
+
+
 
 
 
@@ -529,7 +1052,19 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
+
+
+
+
         if ((int)$this->tabAccess['edit'] && !$this->restrict_edition) {
+
+
+
+
 
 
 
@@ -537,7 +1072,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 'type' => 'switch',
+
+
+
+
 
 
 
@@ -545,7 +1088,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 'name' => 'active',
+
+
+
+
 
 
 
@@ -553,7 +1104,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 'is_bool' => true,
+
+
+
+
 
 
 
@@ -561,7 +1120,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                     array(
+
+
+
+
 
 
 
@@ -569,7 +1136,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                         'value' => 1,
+
+
+
+
 
 
 
@@ -577,7 +1152,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                     ),
+
+
+
+
 
 
 
@@ -585,7 +1168,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                         'id' => 'active_off',
+
+
+
+
 
 
 
@@ -593,7 +1184,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                         'label' => $this->l('Disabled')
+
+
+
+
 
 
 
@@ -601,7 +1200,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 ),
+
+
+
+
 
 
 
@@ -609,7 +1216,19 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
             );
+
+
+
+
+
+
+
+
 
 
 
@@ -621,7 +1240,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
             if ($this->context->employee->id_profile != _PS_ADMIN_PROFILE_) {
+
+
+
+
 
 
 
@@ -629,7 +1256,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                     if ($available_profiles[$i]['id_profile'] == _PS_ADMIN_PROFILE_) {
+
+
+
+
 
 
 
@@ -637,7 +1272,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                         break;
+
+
+
+
 
 
 
@@ -645,7 +1288,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 }
+
+
+
+
 
 
 
@@ -653,7 +1304,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
             $this->fields_form['input'][] = array(
+
+
+
+
 
 
 
@@ -661,7 +1320,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 'label' => $this->l('Permission profile'),
+
+
+
+
 
 
 
@@ -669,7 +1336,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 'required' => true,
+
+
+
+
 
 
 
@@ -677,7 +1352,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                     'query' => $available_profiles,
+
+
+
+
 
 
 
@@ -685,7 +1368,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                     'name' => 'name',
+
+
+
+
 
 
 
@@ -693,7 +1384,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                         'value' => '',
+
+
+
+
 
 
 
@@ -701,11 +1400,23 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                     )
 
 
 
+
+
+
+
                 )
+
+
+
+
 
 
 
@@ -717,7 +1428,19 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
+
+
+
+
             if (Shop::isFeatureActive()) {
+
+
+
+
 
 
 
@@ -725,7 +1448,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                 $this->fields_form['input'][] = array(
+
+
+
+
 
 
 
@@ -733,7 +1464,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                     'label' => $this->l('Shop association'),
+
+
+
+
 
 
 
@@ -741,7 +1480,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
                     'name' => 'checkBoxShopAsso',
+
+
+
+
 
 
 
@@ -749,11 +1496,27 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
             }
 
 
 
+
+
+
+
         }
+
+
+
+
+
+
+
+
 
 
 
@@ -765,7 +1528,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
             'title' => $this->l('Save'),
+
+
+
+
 
 
 
@@ -777,7 +1548,19 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
+
+
+
+
         $this->fields_value['passwd'] = false;
+
+
+
+
 
 
 
@@ -789,7 +1572,19 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
+
+
+
+
         if (empty($obj->id)) {
+
+
+
+
 
 
 
@@ -797,7 +1592,15 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -805,11 +1608,23 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
 }
+
+
+
+
 
 
 

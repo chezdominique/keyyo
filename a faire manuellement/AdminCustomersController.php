@@ -1082,7 +1082,8 @@ class AdminCustomersControllerCore extends AdminController
 			// Products
 			'products' => $products,
 			// Addresses
-			'addresses' => $customer->getAddresses($this->default_form_language),
+            'addresses' => $this->makePhoneCallFiche($customer->getAddresses($this->default_form_language)), // keyyo
+			// 'addresses' => $customer->getAddresses($this->default_form_language),
 			// Discounts
 			'discounts' => CartRule::getCustomerCartRules($this->default_form_language, $customer->id, false, false),
 			// Carts
@@ -1483,6 +1484,34 @@ class AdminCustomersControllerCore extends AdminController
                 die($return);
             }
         }
+    }
+
+
+    public function makePhoneCallFiche($customer)
+    {
+        if (!empty($customer)) {
+            $customer[0]['phone'] = ($customer[0]['phone']) ? $this->makeUrlKeyyoFiche($customer[0]['phone'], $customer) : '';
+            $customer[0]['phone_mobile'] = ($customer[0]['phone_mobile']) ? $this->makeUrlKeyyoFiche($customer[0]['phone_mobile'], $customer) : '';
+        }
+
+        return $customer;
+    }
+
+    public function makeUrlKeyyoFiche($phoneNumber, $customer)
+    {
+            $keyyo_link = '';
+            $NumberK = $this->sanitizePhoneNumber($phoneNumber);
+            $ln = strlen($NumberK);
+
+            $display_message = ($ln != 10 && $ln > 0) ? '<i class="icon-warning text-danger"></i>' : '';
+
+            $keyyo_link .= $display_message . ' <a href="' . Context::getContext()->link->getAdminLink('AdminCustomers');
+            $keyyo_link .= '&ajax=1&action=KeyyoCall';
+            $keyyo_link .= '&CALLEE=' . $NumberK;
+            $keyyo_link .= '&CALLE_NAME=' . $customer[0]['lastname'] . '_' . $customer[0]['firstname'];
+            $keyyo_link .= '" class="keyyo_link">' . $NumberK . '</a>';
+
+    return $keyyo_link;
     }
 
 }

@@ -277,12 +277,14 @@ class Keyyo extends Module
     public function hookDisplayBackOfficeHeader()
     {
         $this->context->controller->addCSS($this->_path . 'views/css/adminkeyyo.css', 'all');
+        $this->context->controller->addJS($this->_path . 'views/js/jquery.cookie.js');
+        $this->context->controller->addJS($this->_path . 'views/js/adminkeyyo.js', 'all');
     }
 
     public function hookDisplayHeader()
     {
-        $this->context->controller->addCSS($this->_path . 'views/css/adminkeyyo.css', 'all');
-        $this->context->controller->addJS($this->_path . 'views/js/adminkeyyo.js', 'all');
+//        $this->context->controller->addCSS($this->_path . 'views/css/adminkeyyo.css', 'all');
+//        $this->context->controller->addJS($this->_path . 'views/js/adminkeyyo.js', 'all');
     }
 
     public function hookDisplayLeftColumn($params)
@@ -296,11 +298,9 @@ class Keyyo extends Module
 
     public function hookDisplayBackOfficeTop()
     {
-//        $checkbox = '<a id="checkboxAppelsKeyyo" class="list-action-enable action-disabled"
-//                        href="index.php?controller=AdminEmployees" title="Activé">
-//	                 <i class="icon-check hidden"></i><i class="icon-remove"></i></a>';
-//
-//        return $checkbox;
+        $checkbox = '<bouton id="checkboxAppelsKeyyo" class="list-action-enable action-disabled" url="' . Context::getContext()->link->getAdminLink('AdminKeyyo') . '&ajax=1&action=AffichageAppels" title="disabled" heureLastNotif="null"><i id="notifKeyyoCheck" class="icon-check hidden"></i><i id="notifKeyyoRemove" class="icon-remove"></i>  Notification d\'appels</bouton>';
+
+        return $checkbox;
     }
 
 }

@@ -24,9 +24,12 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  * International Registred Trademark & Property of PrestaShop SA
  */
-$(document).ready(function(e){
-    $('.keyyo_link').parent().attr('onclick','').css('cursor','text');
-    $('.keyyo_link').click(function(e){
+$(document).ready(function (e) {
+
+    var isEnabled = 'disabled';
+
+    $('.keyyo_link').parent().attr('onclick', '').css('cursor', 'text');
+    $('.keyyo_link').click(function (e) {
         e.preventDefault();
         var link = $(this).attr('href');
         $.ajax({
@@ -34,38 +37,83 @@ $(document).ready(function(e){
             type: 'GET',
             dataType: 'json'
         })
-            .done(function(data) {
+            .done(function (data) {
                 alert(data.msg);
             })
-            .fail(function(data) {
+            .fail(function (data) {
                 alert('Erreur : KEYYO refuse l\'appel.');
             });
     });
 
 
-    $(document).ready(function() {
-        $('#mytrigger').click(function(e) {
-            $('#this_to_be_opened').toggle();
-        });
+
+
+    function toggleBouton() {
+        $('#notifKeyyoCheck').toggleClass('hidden');
+        $('#notifKeyyoRemove').toggleClass('hidden');
+        $('#checkboxAppelsKeyyo').toggleClass('action-disabled').toggleClass('action-enabled');
+    }
+
+    function changeButton() {
+        toggleBouton();
+
+        if ($('#checkboxAppelsKeyyo').prop('title') == 'enabled') {
+            $('#checkboxAppelsKeyyo').prop('title', 'disabled');
+            $.cookie('enableNotificationKeyyo', 'disabled');
+        } else {
+            $('#checkboxAppelsKeyyo').prop('title', 'enabled');
+            $.cookie('enableNotificationKeyyo', 'enabled');
+        }
+    }
+
+
+    $('#checkboxAppelsKeyyo').click(function (e) {
+        changeButton();
+        isEnabled = $('#checkboxAppelsKeyyo').attr('title');
+        link = $('#checkboxAppelsKeyyo').attr('url') + '&isEnabled=' + isEnabled;
+        get_fb_complete(link);
     });
 
 
-        // function get_fb_complete(){
-        //     $('#footer').append('<li>get_fb() ran</li>');
-        //     var feedback = $.ajax({
-        //         type: "POST",
-        //         url: "feedback.php",
-        //         async: false
-        //     }).complete(function(){
-        //         setTimeout(function(){get_fb_complete();}, 1000);
-        //     }).responseText;
-        //
-        //     $('div.feedback-box-complete').html('complete feedback');
-        // }
-        //
-        // $(function(){
-        //     get_fb_complete();
-        // });
+    function get_fb_complete(link) {
 
+        if (isEnabled == 'enabled') {
+            heureLastNotif = $("#checkboxAppelsKeyyo").attr('heureLastNotif');
+
+            var feedback = $.ajax({
+                type: "GET",
+                url: link,
+                dataType: 'json',
+                data: 'heureLN=' + heureLastNotif
+
+            }).done(function (data) {
+                displayNotification(link, data);
+            });
+        }
+    }
+
+    function displayNotification(link, data) {
+        if (typeof data.isEnabled != 'undefined') {
+            isEnabled = data.isEnabled;
+        }
+
+        if (typeof data.heureServeur != 'null') {
+            heureLastNotif = data.heureServeur;
+            $("#checkboxAppelsKeyyo").attr('heureLastNotif', heureLastNotif);
+        }
+
+        setTimeout(function () {
+            get_fb_complete(link);
+        }, 1000);
+    }
+
+
+    if ($.cookie('enableNotificationKeyyo') == 'enabled') {
+
+        changeButton();
+        isEnabled = $('#checkboxAppelsKeyyo').attr('title');
+        link = $('#checkboxAppelsKeyyo').attr('url') + '&isEnabled=' + isEnabled;
+        get_fb_complete(link);
+    }
 
 });

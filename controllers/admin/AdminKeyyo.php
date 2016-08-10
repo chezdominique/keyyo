@@ -27,7 +27,6 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  * International Registred Trademark & Property of PrestaShop SA
  */
-
 class AdminKeyyoController extends ModuleAdminController
 {
     public function __construct()
@@ -79,7 +78,7 @@ class AdminKeyyoController extends ModuleAdminController
 
         parent::__construct();
         $this->addJquery();
-        $this->addJS(_PS_MODULE_DIR_ . 'keyyo/views/js/adminkeyyo.js');
+        $this->addJS(_PS_MODULE_DIR_ . 'keyyo/views/js/jquery.cookie.js');
 
         $this->_select =
             'a.id_customer, a.firstname, a.lastname, ad.address1, ad.postcode, ad.city, ad.phone, ad.phone_mobile';
@@ -128,8 +127,8 @@ class AdminKeyyoController extends ModuleAdminController
 
         $keyyo_url = Configuration::get('KEYYO_URL');
         $account = $this->context->employee->getKeyyoCaller();
-        $callee = Validate::isString(Tools::getValue('CALLEE'))?Tools::getValue('CALLEE'):'';
-        $calle_name = Validate::isString(Tools::getValue('CALLE_NAME'))?Tools::getValue('CALLE_NAME'):'';
+        $callee = Validate::isString(Tools::getValue('CALLEE')) ? Tools::getValue('CALLEE') : '';
+        $calle_name = Validate::isString(Tools::getValue('CALLE_NAME')) ? Tools::getValue('CALLE_NAME') : '';
 
         if (!$account) {
             $return = Tools::jsonEncode(array('msg' => 'Veuillez configurer votre numéro de compte KEYYO.'));
@@ -170,9 +169,72 @@ class AdminKeyyoController extends ModuleAdminController
     }
 
 
-    public function ajaxProcessAffichageAppel()
+    public function ajaxProcessAffichageAppels()
     {
-        return Tools::jsonEncode(array('title' => 'Appel'));
+        // Verifier si l'employé veut les notifications et sur quels numeros
+        // Verifier si il y a une heure de demande et quel heure si pas d'heure, renvoyer desuite l'heure actuelle
+        // si la demande est plus ancienne que
+
+        $isEnabled = Tools::getValue('isEnabled');
+        $listNumeroAccepte = array('33430966996'); // TODO faire le formulaire de numero à cocher dans employé
+
+        $heureLastNotificationCient = Tools::getValue('heureLN');
+        $lastCall = $this->getHeureLastCall();
+
+        $heureLastNotificationServeur = $lastCall['tsms'];
+
+        $lc = substr($lastCall['caller'], 2);
+        ddd($lc);
+
+        if ($this->newDisplay($heureLastNotificationCient, $heureLastNotificationServeur)) {
+            $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'address WHERE `phone` LIKE "%' . $lc . '%" ';
+            $req = Db::getInstance()->executeS($sql);
+
+            // TODO reprendre ici
+
+            die(Tools::jsonEncode(array('heureServeur' => 'inNewCall')));
+        }
+
+
+        $notif = Tools::jsonEncode(array(
+            'isEnabled' => $isEnabled,
+            'heureClient' => $heureLastNotificationCient,
+            'heureServeur' => $heureLastNotificationServeur
+
+        ));
+
+        die(Tools::jsonEncode(array('heureServeur' => 'null')));
+    }
+
+
+    /**
+     * Renvoie l'heure du dernier appel
+     *
+     * @return mixed
+     */
+    private function getHeureLastCall()
+    {
+        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . $this->module->tableName . '` WHERE `type` = "SETUP" ORDER BY `tsms` DESC';
+        $req = (Db::getInstance()->getRow($sql));
+
+        return $req;
+    }
+
+
+    /**
+     * Est-ce que le dernier appel à été affiché ou est-ce une nouvelle session ?
+     *
+     * @param $heureLastNotificationCient
+     * @param $heureLastNotificationServeur
+     * @return bool
+     */
+    private function newDisplay($heureLastNotificationCient, $heureLastNotificationServeur)
+    {
+        if ($heureLastNotificationCient == 'null' or $heureLastNotificationCient == $heureLastNotificationServeur) {
+//            die( Tools::jsonEncode(array('heureServeur' => $heureLastNotificationServeur)));
+            die(Tools::jsonEncode(array('heureServeur' => '1470823126612'))); // TODO renvoie l'avant dernier appel pour test
+        }
+        return true;
     }
 
 }
