@@ -180,20 +180,36 @@ class AdminKeyyoController extends ModuleAdminController
         $heureLastNotificationCient = Tools::getValue('heureLN');
         $lastCall = $this->getHeureLastCall();
         $heureLastNotificationServeur = $lastCall['tsms'];
-        $lc = substr($lastCall['caller'], 2);
 
 
         if ($this->newDisplay($heureLastNotificationCient, $heureLastNotificationServeur)) {
-            $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'address WHERE `phone` LIKE "%' . $lc . '%" ORDER BY `date_upd` ASC';
+            $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'address WHERE `phone` LIKE "%' . substr($lastCall['caller'], 2) . '%" ORDER BY `date_upd` ASC';
             $req = Db::getInstance()->getRow($sql);
+            if ($req) {
+                $notif = Tools::jsonEncode(array(
+                    'show' => 'true',
+                    'heureClient' => $heureLastNotificationServeur,
+                    'heureServeur' => $heureLastNotificationServeur,
+                    'callee' => $lastCall['callee'],
+                    'caller' => $lastCall['caller'],
+                    'redirectingNumber' => ($lastCall['redirectingnumber'])?$lastCall['redirectingnumber']:'',
+                    'linkCustomer' => '',
+                    'message' => 'Numéro trouvé.'
+                ));
+            } else {
+                $notif = Tools::jsonEncode(array(
+                    'show' => 'true',
+                    'heureClient' => $heureLastNotificationServeur,
+                    'heureServeur' => $heureLastNotificationServeur,
+                    'callee' => $lastCall['callee'],
+                    'caller' => $lastCall['caller'],
+                    'redirectingNumber' => ($lastCall['redirectingnumber'])?$lastCall['redirectingnumber']:'',
+                    'linkCustomer' => '',
+                    'message' => 'Numéro non trouvé.'
+                ));
+            }
 
 
-
-            $notif = Tools::jsonEncode(array(
-                'heureClient' => $heureLastNotificationServeur,
-                'heureServeur' => $heureLastNotificationServeur,
-                'show' => 'true'
-            ));
             die($notif);
         }
 
@@ -201,7 +217,8 @@ class AdminKeyyoController extends ModuleAdminController
         $notif = Tools::jsonEncode(array(
             'heureClient' => $heureLastNotificationServeur,
             'heureServeur' => $heureLastNotificationServeur,
-            'show' => 'false'
+            'show' => 'false',
+            'message' => 'Last notif'
         ));
         die($notif);
     }

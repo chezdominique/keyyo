@@ -277,21 +277,23 @@ class Keyyo extends Module
     {
         $this->context->controller->addCSS($this->_path . 'views/css/remodal.css', 'all');
         $this->context->controller->addCSS($this->_path . 'views/css/remodal-default-theme.css', 'all');
+        $this->context->controller->addCSS($this->_path . 'views/css/bootstrap.css', 'all');
         $this->context->controller->addCSS($this->_path . 'views/css/adminkeyyo.css', 'all');
         $this->context->controller->addJS($this->_path . 'views/js/jquery.cookie.js', 'all');
         $this->context->controller->addJS($this->_path . 'views/js/remodal.js', 'all');
         $this->context->controller->addJS($this->_path . 'views/js/adminkeyyo.js', 'all');
 
-        $modal = '<div class="remodal" data-remodal-id="modal">
-              <button data-remodal-action="close" class="remodal-close"></button>
-              <h1>Remodal</h1>
-              <p>
-                Responsive, lightweight, fast, synchronized with CSS animations, fully customizable modal window plugin with declarative configuration and hash tracking.
-              </p>
-              <br>
-              <button data-remodal-action="cancel" class="remodal-cancel">Cancel</button>
-              <button data-remodal-action="confirm" class="remodal-confirm">OK</button>
-            </div>';
+//        $modal = '<div class="remodal" data-remodal-id="modal">
+//              <button data-remodal-action="close" class="remodal-close"></button>
+//              <h1>Appel en cours</h1>
+//                <div id="mainModalKeyyo">
+//
+//                </div>
+//              <br>
+//              <button data-remodal-action="confirm" class="remodal-confirm">OK</button>
+//            </div>';
+
+        $modal = $this->display(__FILE__, 'modalKeyyo.tpl');
 
         return $modal;
 

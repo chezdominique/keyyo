@@ -26,7 +26,7 @@
  */
 $(document).ready(function (e) {
 
-
+    var tempoNotification = 1000;
     var isEnabled = 'disabled';
     var modalKeyyo = $('[data-remodal-id=modal]').remodal();
     $('.keyyo_link').parent().attr('onclick', '').css('cursor', 'text');
@@ -46,6 +46,28 @@ $(document).ready(function (e) {
             });
     });
 
+    if ($.cookie('enableNotificationKeyyo') == 'enabled') {
+
+        changeButton();
+        isEnabled = $('#checkboxAppelsKeyyo').attr('title');
+        link = $('#checkboxAppelsKeyyo').attr('url') + '&isEnabled=' + isEnabled;
+        get_fb_complete(link);
+    }
+
+    $('#checkboxAppelsKeyyo').click(function (e) {
+        changeButton();
+        isEnabled = $('#checkboxAppelsKeyyo').attr('title');
+        link = $('#checkboxAppelsKeyyo').attr('url') + '&isEnabled=' + isEnabled;
+        get_fb_complete(link);
+    });
+
+    $(document).on('closing', '.remodal', function (e) {
+        $('#mainModalKeyyo').empty();
+        console.log('Modal is closing' + (e.reason ? ', reason: ' + e.reason : ''));
+    });
+
+
+
     function toggleBouton() {
         $('#notifKeyyoCheck').toggleClass('hidden');
         $('#notifKeyyoRemove').toggleClass('hidden');
@@ -63,15 +85,6 @@ $(document).ready(function (e) {
             $.cookie('enableNotificationKeyyo', 'enabled');
         }
     }
-
-
-    $('#checkboxAppelsKeyyo').click(function (e) {
-        changeButton();
-        isEnabled = $('#checkboxAppelsKeyyo').attr('title');
-        link = $('#checkboxAppelsKeyyo').attr('url') + '&isEnabled=' + isEnabled;
-        get_fb_complete(link);
-    });
-
 
     function get_fb_complete(link) {
 
@@ -91,25 +104,36 @@ $(document).ready(function (e) {
     }
 
     function displayNotification(link, data) {
-
-        if ( data.show == 'true') {
-            heureLastNotif = data.heureServeur;
-            $("#checkboxAppelsKeyyo").attr('heureLastNotif', heureLastNotif);
-            modalKeyyo.open();
-        }
-
         setTimeout(function () {
             get_fb_complete(link);
-        }, 5000);
+        }, tempoNotification);
+
+
+        if (data.show == 'true') {
+            heureLastNotif = data.heureServeur;
+            $('#checkboxAppelsKeyyo').attr('heureLastNotif', heureLastNotif);
+            nouvelAppel(data);
+            if(modalKeyyo.getState() == 'closed') {
+                modalKeyyo.open();
+            }
+        }
     }
 
+    function nouvelAppel(data) {
 
-    if ($.cookie('enableNotificationKeyyo') == 'enabled') {
+        $('#newRowCall')                         // grab the media content
+            .clone()                          // make a duplicate of it
+            //.find('*')                        // find all elements within the clone
+            .removeAttr('id')               // remove their ID attributes
+            //.end()                            // end the .find()
+            .appendTo('#mainModalKeyyo');
 
-        changeButton();
-        isEnabled = $('#checkboxAppelsKeyyo').attr('title');
-        link = $('#checkboxAppelsKeyyo').attr('url') + '&isEnabled=' + isEnabled;
-        get_fb_complete(link);
+        // newCall = '<div class="newCall">' +
+        //     '<p id="caller">Appel du : ' + data.caller + '</p>' +
+        //     '<p id="calle">Pour le : ' + data.callee + '</p>' +
+        //     '<p id="message">Message : ' + data.message + '</p></div>'
+
     }
+
 
 });
