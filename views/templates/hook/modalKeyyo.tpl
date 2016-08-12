@@ -4,7 +4,7 @@
     <div class="container-fluid" id="mainModalKeyyo">
 
     </div>
-    <a data-remodal-action="confirm" class="remodal-confirm" href="#">OK</a>
+    <a data-remodal-action="confirm" class="remodal-confirm" href="#">Fermer</a>
 </div>
 
 <div id="newRowCall" class="row newRowCall">
@@ -17,16 +17,20 @@
             </thead>
             <tbody>
             <tr>
-                <td id="caller"><strong>Appel du :</strong> <span class="pull-right">596696865385</span></td>
+                <td><strong>Appel du :</strong> <span  id="caller" class="pull-right"></span></td>
             </tr>
             <tr>
-                <td id="calle"><strong>Pour le :</strong><span class="pull-right">33430966600</span></td>
+                <td><strong>Pour le :</strong><span  id="calle" class="pull-right"></span></td>
             </tr>
             <tr>
-                <td id="message"><strong>Message :</strong><span class="pull-right">Numéro trouvé.</span></td>
+                <td><strong>Heure :</strong><span  id="heureAppel" class="pull-right"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Message :</strong><span  id="message" class="pull-right"></span></td>
             </tr>
             </tbody>
         </table>
+        <button id="fermerAppel" class="remodal-confirm">Fermer</button>
     </div>
     <div class="col-md-6">
         <table class="table table-hover text-left">

@@ -67,7 +67,6 @@ $(document).ready(function (e) {
     });
 
 
-
     function toggleBouton() {
         $('#notifKeyyoCheck').toggleClass('hidden');
         $('#notifKeyyoRemove').toggleClass('hidden');
@@ -113,26 +112,34 @@ $(document).ready(function (e) {
             heureLastNotif = data.heureServeur;
             $('#checkboxAppelsKeyyo').attr('heureLastNotif', heureLastNotif);
             nouvelAppel(data);
-            if(modalKeyyo.getState() == 'closed') {
+            if (modalKeyyo.getState() == 'closed') {
                 modalKeyyo.open();
             }
         }
     }
 
     function nouvelAppel(data) {
+        d = new Date(data.heureServeur * 1000);
+        heureAppel = d.getHours() + ' : ' + d.getMinutes();
 
-        $('#newRowCall')                         // grab the media content
-            .clone()                          // make a duplicate of it
-            //.find('*')                        // find all elements within the clone
-            .removeAttr('id')               // remove their ID attributes
-            //.end()                            // end the .find()
-            .appendTo('#mainModalKeyyo');
+        var newRow = $('#newRowCall')
+            .clone()
+            .attr('id', data.heureServeur);
 
-        // newCall = '<div class="newCall">' +
-        //     '<p id="caller">Appel du : ' + data.caller + '</p>' +
-        //     '<p id="calle">Pour le : ' + data.callee + '</p>' +
-        //     '<p id="message">Message : ' + data.message + '</p></div>'
+        newRow.find('#fermerAppel').attr('id', data.heureServeur).click(function(e){
+            newRow.hide("slow")
+        });
+        newRow.find('#caller').removeAttr('id').html(data.caller);
+        newRow.find('#callee').removeAttr('id').html(data.callee);
+        newRow.find('#message').removeAttr('id').html(data.message);
+        newRow.find('#heureAppel').removeAttr('id').html(heureAppel);
 
+        newRow.appendTo('#mainModalKeyyo');
+
+
+        //.find('*')                    // find all elements within the clone
+        //.end()                        // end the .find()
+        //.removeAttr('id')               // remove their ID attributes
     }
 
 
