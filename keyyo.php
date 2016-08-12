@@ -37,7 +37,7 @@ class Keyyo extends Module
     protected $config = array(
         'KEYYO_ACCOUNT' => '', // Compte par defaut KEYYO
         'KEYYO_NUMBER_FILTER' => ' .-_+', // Supprime les caractères suivant des numéros de téléphone
-        'KEYYO_URL' => 'http://www.chez-dominique.fr/makecall.php'
+        'KEYYO_URL' => 'https://ssl.keyyo.com/makecall.html'
     );
 
     public function __construct()
@@ -117,7 +117,6 @@ class Keyyo extends Module
 
     public function createNotificationKeyyoTable()
     {
-        return true;
         $sql = 'CREATE TABLE `' . _DB_PREFIX_ . $this->tableName . '` (
             `id_notification_keyyo` INT (12) NOT NULL AUTO_INCREMENT,
             `account` VARCHAR (32) NULL,
@@ -148,7 +147,6 @@ class Keyyo extends Module
 
     private function removeNotificationKeyyoTable()
     {
-        return true;
         if (!Db::getInstance()->Execute('DROP TABLE `' . _DB_PREFIX_ . $this->tableName . '`'))
             return false;
         return true;
@@ -200,7 +198,7 @@ class Keyyo extends Module
 
     public function getContent()
     {
-        $keyyo_caller = $this->context->employee->getKeyyoCaller();
+        $keyyo_caller = $this->context->employee->keyyo_caller;
         if (!$keyyo_caller) {
             $this->html .= $this->displayError($this->l('Veuillez configurer votre numéro d\'appelé
             dans l\'onglet Administration>Employés '));
@@ -285,28 +283,20 @@ class Keyyo extends Module
 
     public function hookDisplayBackOfficeHeader()
     {
-        $this->context->controller->addCSS($this->_path . 'views/css/remodal.css', 'all');
-        $this->context->controller->addCSS($this->_path . 'views/css/remodal-default-theme.css', 'all');
-        $this->context->controller->addCSS($this->_path . 'views/css/bootstrap.css', 'all');
-        $this->context->controller->addCSS($this->_path . 'views/css/adminkeyyo.css', 'all');
-        $this->context->controller->addJS($this->_path . 'views/js/jquery.cookie.js', 'all');
-        $this->context->controller->addJS($this->_path . 'views/js/remodal.js', 'all');
-        $this->context->controller->addJS($this->_path . 'views/js/adminkeyyo.js', 'all');
+        if ($this->context->employee->keyyo_notification_enabled) {
+            $this->context->controller->addJquery();
+            $this->context->controller->addCSS($this->_path . 'views/css/remodal.css', 'all');
+            $this->context->controller->addCSS($this->_path . 'views/css/remodal-default-theme.css', 'all');
+            $this->context->controller->addCSS($this->_path . 'views/css/bootstrap.css', 'all');
+            $this->context->controller->addCSS($this->_path . 'views/css/adminkeyyo.css', 'all');
+            $this->context->controller->addJS($this->_path . 'views/js/jquery.cookie.js', 'all');
+            $this->context->controller->addJS($this->_path . 'views/js/remodal.js', 'all');
+            $this->context->controller->addJS($this->_path . 'views/js/adminkeyyo.js', 'all');
 
-//        $modal = '<div class="remodal" data-remodal-id="modal">
-//              <button data-remodal-action="close" class="remodal-close"></button>
-//              <h1>Appel en cours</h1>
-//                <div id="mainModalKeyyo">
-//
-//                </div>
-//              <br>
-//              <button data-remodal-action="confirm" class="remodal-confirm">OK</button>
-//            </div>';
-
-        $modal = $this->display(__FILE__, 'modalKeyyo.tpl');
-
-        return $modal;
-
+            $modal = $this->display(__FILE__, 'modalKeyyo.tpl');
+            return $modal;
+        }
+        return false;
     }
 
 
@@ -319,10 +309,16 @@ class Keyyo extends Module
 //            return $this->display(__FILE__, 'notificationsKeyyo.tpl');
     }
 
+
     public function hookDisplayBackOfficeTop()
     {
-        $checkbox = '<bouton id="checkboxAppelsKeyyo" class="list-action-enable action-disabled" url="' . Context::getContext()->link->getAdminLink('AdminKeyyo') . '&ajax=1&action=AffichageAppels" title="disabled" heureLastNotif="1470823219600"><i id="notifKeyyoCheck" class="icon-check hidden"></i><i id="notifKeyyoRemove" class="icon-remove"></i>  Notification d\'appels</bouton>';
-        return $checkbox;
+        if ($this->context->employee->keyyo_notification_enabled) {
+//            $heureLastCall = '1471011321951';
+            $heureLastCall = 'null';
+            $checkbox = '<bouton id="checkboxAppelsKeyyo" class="list-action-enable action-disabled" url="' . Context::getContext()->link->getAdminLink('AdminKeyyo') . '&ajax=1&action=AffichageAppels" title="disabled" heureLastNotif="' . $heureLastCall . '"><i id="notifKeyyoCheck" class="icon-check hidden"></i><i id="notifKeyyoRemove" class="icon-remove"></i>  Notification d\'appels</bouton>';
+            return $checkbox;
+        }
+        return false;
     }
 
 }

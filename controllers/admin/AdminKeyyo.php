@@ -29,6 +29,7 @@
  */
 class AdminKeyyoController extends ModuleAdminController
 {
+
     public function __construct()
     {
         if (!defined('_PS_VERSION_')) {
@@ -175,44 +176,83 @@ class AdminKeyyoController extends ModuleAdminController
         // Verifier si il y a une heure de demande et quel heure si pas d'heure, renvoyer desuite l'heure actuelle
         // si la demande est plus ancienne que
 
-        $listNumeroAccepte = array('33430966996'); // TODO faire le formulaire de numero à cocher dans employé
+        $notif = array(
+            'show' => 'true',
+            'heureClient' => '',
+            'heureServeur' => '',
+            'callee' => '',
+            'caller' => '',
+            'redirectingNumber' => '',
+            'linkCustomer' => '',
+            'message' => '',
+            'callerName' => '',
+            'histoMessage' => array(),
+            'dateMessage' => ''
+        );
 
-        $heureLastNotificationCient = Tools::getValue('heureLN');
+        // Est-ce que l'employé peut afficher les notifications ?
+        if (!$this->context->employee->keyyo_notification_enabled) {
+            $notif['message'] = $this->l('Vous ne pouvez pas afficher les notifications');
+            $notif['show'] = 'false';
+            die(Tools::jsonEncode($notif));
+        }
         $lastCall = $this->getHeureLastCall();
+        $notif['caller'] = $lastCall['caller'];
+        $notif['callee'] = $lastCall['callee'];
+        $notif['redirectingNumber'] = ($lastCall['redirectingnumber']) ? $lastCall['redirectingnumber'] : '';
+
+        $listeNumerosAcceptes = explode(',', $this->context->employee->keyyo_notification_numbers);
+        $heureLastNotificationCient = Tools::getValue('heureLN');
+//        $heureLastNotificationCient = '1471002650629';
         $heureLastNotificationServeur = $lastCall['tsms'];
 
+        // Est-ce que le numéro appelé fait partir des numéros surveiller par l'employé ?
+        if (in_array($notif['callee'], $listeNumerosAcceptes)) {
 
+            // Est-ce qu'il s'agit d'une nouvelle notification ?
         if ($this->newDisplay($heureLastNotificationCient, $heureLastNotificationServeur)) {
-            $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'address WHERE `phone` LIKE "%' . substr($lastCall['caller'], 2) . '%" ORDER BY `date_upd` ASC';
-            $req = Db::getInstance()->getRow($sql);
-            if ($req) {
-                $notif = Tools::jsonEncode(array(
-                    'show' => 'true',
-                    'heureClient' => $heureLastNotificationServeur,
-                    'heureServeur' => $heureLastNotificationServeur,
-                    'callee' => $lastCall['callee'],
-                    'caller' => $lastCall['caller'],
-                    'redirectingNumber' => ($lastCall['redirectingnumber'])?$lastCall['redirectingnumber']:'',
-                    'linkCustomer' => '',
-                    'message' => 'Numéro trouvé.'
-                ));
-            } else {
-                $notif = Tools::jsonEncode(array(
-                    'show' => 'true',
-                    'heureClient' => $heureLastNotificationServeur,
-                    'heureServeur' => $heureLastNotificationServeur,
-                    'callee' => $lastCall['callee'],
-                    'caller' => $lastCall['caller'],
-                    'redirectingNumber' => ($lastCall['redirectingnumber'])?$lastCall['redirectingnumber']:'',
-                    'linkCustomer' => '',
-                    'message' => 'Numéro non trouvé.'
-                ));
+                // on synchronise le serveur et le client
+                $notif['heureClient'] = $heureLastNotificationServeur;
+                $notif['heureServeur'] = $heureLastNotificationServeur;
+                $notif['show'] = 'true';
+
+                $query = new DbQuery();
+                $query->select('a.*, c.*, cc.*')
+                    ->from('address', 'a')
+                    ->leftJoin('customer', 'c', 'a.id_customer = c.id_customer')
+                    ->leftJoin('customer_comments', 'cc', 'a.id_customer = cc.id_customer' )
+                    ->where('a.phone LIKE "%' . substr($lastCall['caller'], 2) . '%"')
+                    ->orderBy('cc.date_posted DESC')
+                    ->limit(5);
+
+                $results = Db::getInstance()->executeS($query);
+
+                // Si le numéro caller est trouvé
+                if ($results) {
+                    // Création du lien vers la fiche client
+                    $tokenLite = Tools::getAdminTokenLite('AdminCustomers');
+                    $link = self::$currentIndex . '&controller=AdminCustomers&id_customer=' . $results[0]['id_customer'] . '&viewcustomer&token=' . $tokenLite;
+                    $notif['linkCustomer'] = $link;
+
+                    $notif['callerName'] = strtoupper($results[0]['lastname']) . ' ' . ucfirst($results[0]['firstname']);
+
+                    $employe = new Employee($results[0]['id_employee']);
+
+                    foreach ($results as $result) {
+                        $notif['histoMessage'][] = '<tr><td><p>'. $employe->lastname . ' ' . $employe->firstname . '</p><p>'. $result['date_posted'].'</p></td><td>'.$result['comment'].'</td></tr>';
+                    }
+
+                    $notif['dateMessage'] = date('Y-m-d à H:m:s' , substr($notif['heureServeur'], 0, 10));
+
+                    $notif['message'] = 'Numéro trouvé';
+                } else {
+                    $notif['message'] = 'Numéro non trouvé.';
+
+                }
+
+                die(Tools::jsonEncode($notif));
             }
-
-
-            die($notif);
         }
-
 
         $notif = Tools::jsonEncode(array(
             'heureClient' => $heureLastNotificationServeur,
@@ -247,7 +287,9 @@ class AdminKeyyoController extends ModuleAdminController
      */
     private function newDisplay($heureLastNotificationCient, $heureLastNotificationServeur)
     {
-        if ($heureLastNotificationCient == 'null' or $heureLastNotificationCient == $heureLastNotificationServeur) {
+        if ($heureLastNotificationCient == 'null' or
+            $heureLastNotificationServeur == $heureLastNotificationCient
+        ) {
             return false;
         }
         return true;

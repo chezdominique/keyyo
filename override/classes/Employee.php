@@ -21,18 +21,10 @@ class Employee extends EmployeeCore
 
         parent::__construct($id, $id_lang, $id_shop);
     }
+
     public function getKeyyoCaller()
+
     {
         return $this->keyyo_caller;
-    }
-
-    public function getKeyyoNotificationEnabled()
-    {
-        return $this->keyyo_notification_enabled;
-    }
-
-    public function getKeyyo_notification_numbers()
-    {
-        return $this->keyyo_notification_numbers;
     }
 }

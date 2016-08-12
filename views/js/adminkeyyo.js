@@ -115,6 +115,10 @@ $(document).ready(function (e) {
             if (modalKeyyo.getState() == 'closed') {
                 modalKeyyo.open();
             }
+        } else {
+            heureLastNotif = data.heureServeur;
+            $('#checkboxAppelsKeyyo').attr('heureLastNotif', heureLastNotif);
+            console.log(data.message);
         }
     }
 
@@ -125,14 +129,22 @@ $(document).ready(function (e) {
         var newRow = $('#newRowCall')
             .clone()
             .attr('id', data.heureServeur);
-
-        newRow.find('#fermerAppel').attr('id', data.heureServeur).click(function(e){
+        newRow.find('#fermerAppel').attr('id', data.heureServeur).click(function (e) {
             newRow.hide("slow")
         });
+
         newRow.find('#caller').removeAttr('id').html(data.caller);
         newRow.find('#callee').removeAttr('id').html(data.callee);
+        newRow.find('#callerName').removeAttr('id').html(data.callerName);
         newRow.find('#message').removeAttr('id').html(data.message);
-        newRow.find('#heureAppel').removeAttr('id').html(heureAppel);
+        newRow.find('#dateMessage').removeAttr('id').html(data.dateMessage);
+        newRow.find('#voirFicheClient').removeAttr('id').attr('href', data.linkCustomer);
+
+
+        for (var histoMes in data.histoMessage) {
+            newRow.find('#histoMessage').append(data.histoMessage[histoMes]);
+        }
+        newRow.find('#histoMessage').removeAttr('id');
 
         newRow.appendTo('#mainModalKeyyo');
 
@@ -141,6 +153,5 @@ $(document).ready(function (e) {
         //.end()                        // end the .find()
         //.removeAttr('id')               // remove their ID attributes
     }
-
 
 });

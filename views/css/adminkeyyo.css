@@ -30,7 +30,11 @@
 }
 
 .tableInformationNewCall {
-    width: 40%;
+    width: 30%;
+}
+
+.newRowCall p {
+  margin-bottom: 0px;
 }
 
 .newRowCall {
@@ -38,6 +42,14 @@
     margin-bottom: 6px;
 }
 
+.newRowCall h2 {
+    margin-left: 12px;
+}
+
 #newRowCall {
     display: none;
+}
+
+.remodal-confirm-link:hover  {
+    color:white;
 }

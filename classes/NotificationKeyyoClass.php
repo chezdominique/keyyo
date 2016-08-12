@@ -1,6 +1,6 @@
 <?php
 
-class KeyyoClass extends ObjectModel
+class NotificationKeyyoClass extends ObjectModel
 {
     public $id_notification_keyyo;
 
@@ -84,4 +84,8 @@ class KeyyoClass extends ObjectModel
      */
     public $type;
 
+    public static $definition = array(
+        'table' => _DB_PREFIX_.'notification_keyyo',
+        'primary' => 'id_notification_keyyo',
+    );
 }
