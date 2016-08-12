@@ -96,9 +96,17 @@ class Keyyo extends Module
     public function alterEmployeeTable($method = 'add')
     {
         if ($method == 'add') {
-            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'employee ADD `keyyo_caller` VARCHAR (15) NULL';
+            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'employee 
+            ADD `keyyo_caller` VARCHAR (15) NULL,
+            ADD `keyyo_notification_enabled` BOOL DEFAULT FALSE,
+            ADD `keyyo_notification_numbers` VARCHAR (255) NULL
+            ';
         } else {
-            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'employee DROP COLUMN `keyyo_caller`';
+            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'employee 
+            DROP COLUMN `keyyo_caller`,
+            DROP COLUMN `keyyo_notification_enabled`,
+            DROP COLUMN `keyyo_notification_numbers`
+            ';
         }
 
         if (!Db::getInstance()->execute($sql)) {
@@ -109,6 +117,7 @@ class Keyyo extends Module
 
     public function createNotificationKeyyoTable()
     {
+        return true;
         $sql = 'CREATE TABLE `' . _DB_PREFIX_ . $this->tableName . '` (
             `id_notification_keyyo` INT (12) NOT NULL AUTO_INCREMENT,
             `account` VARCHAR (32) NULL,
@@ -139,6 +148,7 @@ class Keyyo extends Module
 
     private function removeNotificationKeyyoTable()
     {
+        return true;
         if (!Db::getInstance()->Execute('DROP TABLE `' . _DB_PREFIX_ . $this->tableName . '`'))
             return false;
         return true;
