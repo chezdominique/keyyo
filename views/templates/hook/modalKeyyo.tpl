@@ -20,6 +20,9 @@
                 <td><strong>Appel du :</strong> <span id="caller" class="pull-right"></span></td>
             </tr>
             <tr>
+                <td><strong>Renvoie du :</strong><span id="redirectingNumber" class="pull-right"></span></td>
+            </tr>
+            <tr>
                 <td><strong>Pour le :</strong><span id="callee" class="pull-right"></span></td>
             </tr>
             <tr>
@@ -37,7 +40,7 @@
                         <div class="col-md-12">
                             <textarea class="form-control textareaMessagesNewCall" name="customer_comment"
                                       id="customer_comment_Modal"></textarea>
-                            <button type="submit" class="btn btn-info input-block-level form-control" name="submitCustomerComment">Ajouter un
+                            <button href="#" id="submitCustomerComment" type="submit" class="btn btn-info input-block-level form-control submitCustomerComment" name="submitCustomerComment">Ajouter un
                                 commentaire
                             </button>
                         </div>

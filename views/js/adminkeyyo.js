@@ -29,6 +29,8 @@ $(document).ready(function (e) {
     var tempoNotification = 3000;
     var isEnabled = 'disabled';
     var modalKeyyo = $('[data-remodal-id=modal]').remodal();
+
+    // Appel Keyyo
     $('.keyyo_link').parent().attr('onclick', '').css('cursor', 'text');
     $('.keyyo_link').click(function (e) {
         e.preventDefault();
@@ -46,6 +48,8 @@ $(document).ready(function (e) {
             });
     });
 
+
+    // change l'état du bouton notification au chargement de la page
     if ($.cookie('enableNotificationKeyyo') == 'enabled') {
         changeButton();
         isEnabled = $('#checkboxAppelsKeyyo').attr('title');
@@ -53,6 +57,7 @@ $(document).ready(function (e) {
         get_fb_complete(link);
     }
 
+    // Lors du click sur le bouton, démarre la surveillance des nouveaux appels
     $('#checkboxAppelsKeyyo').click(function (e) {
         changeButton();
         isEnabled = $('#checkboxAppelsKeyyo').attr('title');
@@ -60,17 +65,20 @@ $(document).ready(function (e) {
         get_fb_complete(link);
     });
 
+    // Vide la liste des appels de la fenetre modale lors de sa fermeture
     $(document).on('closing', '.remodal', function (e) {
         $('#mainModalKeyyo').empty();
     });
 
 
+    // Change l'état du bouton de notification
     function toggleBouton() {
         $('#notifKeyyoCheck').toggleClass('hidden');
         $('#notifKeyyoRemove').toggleClass('hidden');
         $('#checkboxAppelsKeyyo').toggleClass('action-disabled').toggleClass('action-enabled');
     }
 
+    // Change le cookie et l'attribut title du bouton de notification
     function changeButton() {
         toggleBouton();
 
@@ -83,6 +91,7 @@ $(document).ready(function (e) {
         }
     }
 
+    // Fait la requete cyclique pour savoir si il y a de nouveau appels
     function get_fb_complete(link) {
 
         if (isEnabled == 'enabled') {
@@ -93,13 +102,13 @@ $(document).ready(function (e) {
                 url: link,
                 dataType: 'json',
                 data: 'heureLN=' + heureLastNotif
-
             }).done(function (data) {
                 displayNotification(link, data);
             });
         }
     }
 
+    // Affiche les nouvelles notifications
     function displayNotification(link, data) {
         setTimeout(function () {
             get_fb_complete(link);
@@ -119,6 +128,7 @@ $(document).ready(function (e) {
         }
     }
 
+    // Crée le contenu d'un nouvel appel qui sera intégré dans la fenetre modale
     function nouvelAppel(data) {
         d = new Date(data.heureServeur * 1000);
         heureAppel = d.getHours() + ' : ' + d.getMinutes();
@@ -130,12 +140,49 @@ $(document).ready(function (e) {
             newRow.slideUp("slow")
         });
         newRow.find('#caller').removeAttr('id').html(data.caller);
+        newRow.find('#redirectingNumber').removeAttr('id').html(data.redirectingNumber);
         newRow.find('#callee').removeAttr('id').html(data.callee);
         newRow.find('#dateMessage').removeAttr('id').html(data.dateMessage);
         newRow.find('#message').removeAttr('id').html(data.message);
-
+        console.log(data.linkPostComment);
         if (data.message == 'Numéro trouvé.') {
             newRow.find('#callerName').removeAttr('id').html(data.callerName);
+
+            var id_textarea = 'textarea' + data.heureServeur;
+            newRow.find('#customer_comment_Modal').attr({
+                'value': data.messageHistorique,
+                'id': id_textarea
+            });
+
+            newRow.find('#submitCustomerComment').removeAttr('id').attr({
+                'href': data.linkPostComment,
+                'id_customer': data.id_customer,
+                'id_employee': data.id_employee,
+                'id_textearea': id_textarea
+            }).click(function (e) {
+                e.preventDefault();
+                var link = $(this).attr('href');
+                var id_customer = $(this).attr('id_customer');
+                var id_employee = $(this).attr('id_employee');
+                var comment = $('#' + $(this).attr('id_textearea')).val();
+
+                $.ajax({
+                    url: link,
+                    type: 'GET',
+                    data: {
+                    'id_customer' : id_customer,
+                    'id_employee' : id_employee,
+                    'comment' : comment
+                    },
+                    dataType: 'json'
+                })
+                    .done(function (data) {
+                        alert(data.message);
+                    })
+                    .fail(function (data) {
+                        alert('Erreur :');
+                    });
+            });
             newRow.find('#voirFicheClient').removeAttr('id').attr('href', data.linkCustomer);
 
             for (var histoMes in data.histoMessage) {
@@ -148,13 +195,24 @@ $(document).ready(function (e) {
             newRow.find('#informationNewRowCall').removeClass('col-md-2', 'col-md-12').removeAttr('id');
         }
 
-
         newRow.appendTo('#mainModalKeyyo').slideDown().attr('id', data.heureServeur);
-
-
-        //.find('*')                    // find all elements within the clone
-        //.end()                        // end the .find()
-        //.removeAttr('id')               // remove their ID attributes
     }
 
+
+    $('.submitCustomerComment').click(function (e) {
+        e.preventDefault();
+        var link = $(this).attr('href');
+        $.ajax({
+            url: link,
+            type: 'GET',
+            dataType: 'json'
+        })
+            .done(function (data) {
+                alert(data.msg);
+            })
+            .fail(function (data) {
+                alert('Erreur : KEYYO refuse l\'appel.');
+            });
     });
+
+});

@@ -187,7 +187,11 @@ class AdminKeyyoController extends ModuleAdminController
             'message' => '',
             'callerName' => '',
             'histoMessage' => array(),
-            'dateMessage' => ''
+            'dateMessage' => '',
+            'messageHistorique' => '',
+            'id_customer' => '',
+            'id_employee' => '',
+            'linkPostComment' => ''
         );
 
         // Est-ce que l'employé peut afficher les notifications ?
@@ -219,12 +223,11 @@ class AdminKeyyoController extends ModuleAdminController
                 $query->select('a.*, c.*')
                     ->from('address', 'a')
                     ->leftJoin('customer', 'c', 'a.id_customer = c.id_customer')
-                    ->where('a.phone LIKE "%' . substr($lastCall['caller'], 2) . '%"')
-                    ->orderBy('c.date_upd DESC')
-                    ->limit(5);
+                    ->where('a.phone LIKE "%' . pSQL(substr($lastCall['caller'], 2)) . '%"')
+                    ->where('a.phone_mobile LIKE "%' . pSQL(substr($lastCall['caller'], 2)) . '%"')
+                    ->orderBy('c.date_upd DESC');
 
-                $results = Db::getInstance()->executeS($query);
-
+                $results = Db::getInstance()->getRow($query);
                 // Si le numéro caller est trouvé
                 if ($results) {
                     // Création du lien vers la fiche client
@@ -237,25 +240,31 @@ class AdminKeyyoController extends ModuleAdminController
                         ? '+' . $notif['redirectingNumber']
                         : $notif['redirectingNumber'];
                     $notif['redirectingNumber'] = wordwrap($notif['redirectingNumber'], 2, " ", 1);
-
                     $notif['callerName'] = strtoupper($results['lastname']) . ' ' . ucfirst($results['firstname']);
-                    $employe = new Employee($results['id_employee']);
-
+                    $notif['id_customer'] = $results['id_customer'];
+                    $notif['id_employe'] = $results['id_employee'];
+                    $tokenLiteComment = Tools::getAdminTokenLite('AdminKeyyo');
+                    $notif['linkPostComment'] = self::$currentIndex . '&controller=AdminKeyyo&ajax=1&action=KeyyoComment&token='
+                        . $tokenLiteComment;
 
                     $query = new DbQuery();
-                    $query->select('a.*, c.*, cc.*')
-                        ->from('address', 'a')
-                        ->leftJoin('customer', 'c', 'a.id_customer = c.id_customer')
-                        ->leftJoin('customer_comments', 'cc', 'a.id_customer = cc.id_customer')
-                        ->where('a.phone LIKE "%' . substr($lastCall['caller'], 2) . '%"')
+                    $query->select('cc.*')
+                        ->from('customer_comments', 'cc')
+                        ->where('id_customer = "' . pSQL($results['id_customer']) . '"')
                         ->orderBy('cc.date_posted DESC')
                         ->limit(5);
-
                     $resultsComments = Db::getInstance()->executeS($query);
+
                     foreach ($resultsComments as $result) {
-                        $notif['histoMessage'][] = '<tr><td><p>' . $employe->lastname . ' ' . $employe->firstname . '</p><p>' . $result['date_posted'] . '</p></td><td>' . $result['comment'] . '</td></tr>';
+                        $employe = new Employee($result['id_employee']);
+
+                        $notif['histoMessage'][] = '<tr><td><p>'. $employe->firstname[0] .'. '. $employe->lastname
+                            . '</p><p>' . $result['date_posted'] . '</p></td><td>' . $result['comment'] . '</td></tr>';
                     }
 
+                    $notif['messageHistorique'] = 'Appel de ' . $notif['callerName'] . ' à '
+                        . date('H:m:s \l\e d-m-Y', substr($notif['heureServeur'], 0, 10))
+                        . ' Numéro : ' . $notif['caller'];
                     $notif['message'] = 'Numéro trouvé.';
                 } else {
                     $notif['message'] = 'Numéro non trouvé.';
@@ -313,5 +322,39 @@ class AdminKeyyoController extends ModuleAdminController
         }
         return true;
     }
+
+    public function ajaxProcessKeyyoComment()
+    {
+        $comment = array(
+            'id_customer' => Tools::getValue('id_customer'),
+            'id_employee' => '2', // Tools::getValue('id_employee'),
+            'comment' => Tools::getValue('comment')
+        );
+
+        if (!Validate::isInt($comment['id_customer']) or
+            !Validate::isInt($comment['id_employee']) or
+            !Validate::isGenericName($comment['comment']) or
+            empty($comment['id_employee']) or
+            empty($comment['id_customer']) or
+            empty($comment['comment'])
+        ) {
+            die(Tools::jsonEncode(array(
+                'message' => 'Erreur',
+                '1' => $comment['id_employee'],
+                '2' => $comment['id_customer']
+            )));
+        }
+
+        $req = Db::getInstance()->insert('customer_comments', $comment);
+
+        if ($req) {
+            die(Tools::jsonEncode(array('message' => 'Commentaire ajouté')));
+        } else {
+            die(Tools::jsonEncode(array('message' => 'Il y a eu une erreur')));
+        }
+
+
+    }
+
 
 }
