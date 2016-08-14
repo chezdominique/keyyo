@@ -26,7 +26,7 @@
  */
 $(document).ready(function (e) {
 
-    var tempoNotification = 1000;
+    var tempoNotification = 3000;
     var isEnabled = 'disabled';
     var modalKeyyo = $('[data-remodal-id=modal]').remodal();
     $('.keyyo_link').parent().attr('onclick', '').css('cursor', 'text');
@@ -47,7 +47,6 @@ $(document).ready(function (e) {
     });
 
     if ($.cookie('enableNotificationKeyyo') == 'enabled') {
-
         changeButton();
         isEnabled = $('#checkboxAppelsKeyyo').attr('title');
         link = $('#checkboxAppelsKeyyo').attr('url') + '&isEnabled=' + isEnabled;
@@ -63,7 +62,6 @@ $(document).ready(function (e) {
 
     $(document).on('closing', '.remodal', function (e) {
         $('#mainModalKeyyo').empty();
-        console.log('Modal is closing' + (e.reason ? ', reason: ' + e.reason : ''));
     });
 
 
@@ -90,7 +88,7 @@ $(document).ready(function (e) {
         if (isEnabled == 'enabled') {
             heureLastNotif = $("#checkboxAppelsKeyyo").attr('heureLastNotif');
 
-            var feedback = $.ajax({
+            $.ajax({
                 type: "GET",
                 url: link,
                 dataType: 'json',
@@ -106,7 +104,6 @@ $(document).ready(function (e) {
         setTimeout(function () {
             get_fb_complete(link);
         }, tempoNotification);
-
 
         if (data.show == 'true') {
             heureLastNotif = data.heureServeur;
@@ -127,26 +124,32 @@ $(document).ready(function (e) {
         heureAppel = d.getHours() + ' : ' + d.getMinutes();
 
         var newRow = $('#newRowCall')
-            .clone()
-            .attr('id', data.heureServeur);
-        newRow.find('#fermerAppel').attr('id', data.heureServeur).click(function (e) {
-            newRow.hide("slow")
-        });
+            .clone();
 
+        newRow.find('#fermerAppel').attr('id', data.heureServeur).click(function (e) {
+            newRow.slideUp("slow")
+        });
         newRow.find('#caller').removeAttr('id').html(data.caller);
         newRow.find('#callee').removeAttr('id').html(data.callee);
-        newRow.find('#callerName').removeAttr('id').html(data.callerName);
-        newRow.find('#message').removeAttr('id').html(data.message);
         newRow.find('#dateMessage').removeAttr('id').html(data.dateMessage);
-        newRow.find('#voirFicheClient').removeAttr('id').attr('href', data.linkCustomer);
+        newRow.find('#message').removeAttr('id').html(data.message);
 
+        if (data.message == 'Numéro trouvé.') {
+            newRow.find('#callerName').removeAttr('id').html(data.callerName);
+            newRow.find('#voirFicheClient').removeAttr('id').attr('href', data.linkCustomer);
 
-        for (var histoMes in data.histoMessage) {
-            newRow.find('#histoMessage').append(data.histoMessage[histoMes]);
+            for (var histoMes in data.histoMessage) {
+                newRow.find('#histoMessage').append(data.histoMessage[histoMes]);
+            }
+            newRow.find('#histoMessage').removeAttr('id');
+        } else {
+            newRow.find('#tableInformationNewRowCall').remove();
+            newRow.find('#commentaireNewRowCall').remove();
+            newRow.find('#informationNewRowCall').removeClass('col-md-2', 'col-md-12').removeAttr('id');
         }
-        newRow.find('#histoMessage').removeAttr('id');
 
-        newRow.appendTo('#mainModalKeyyo');
+
+        newRow.appendTo('#mainModalKeyyo').slideDown().attr('id', data.heureServeur);
 
 
         //.find('*')                    // find all elements within the clone
@@ -154,4 +157,4 @@ $(document).ready(function (e) {
         //.removeAttr('id')               // remove their ID attributes
     }
 
-});
+    });

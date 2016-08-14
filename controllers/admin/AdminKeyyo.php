@@ -203,26 +203,24 @@ class AdminKeyyoController extends ModuleAdminController
 
         $listeNumerosAcceptes = explode(',', $this->context->employee->keyyo_notification_numbers);
         $heureLastNotificationCient = Tools::getValue('heureLN');
-//        $heureLastNotificationCient = '1471002650629';
         $heureLastNotificationServeur = $lastCall['tsms'];
 
         // Est-ce que le numéro appelé fait partir des numéros surveiller par l'employé ?
         if (in_array($notif['callee'], $listeNumerosAcceptes)) {
 
             // Est-ce qu'il s'agit d'une nouvelle notification ?
-        if ($this->newDisplay($heureLastNotificationCient, $heureLastNotificationServeur)) {
+            if ($this->newDisplay($heureLastNotificationCient, $heureLastNotificationServeur)) {
                 // on synchronise le serveur et le client
                 $notif['heureClient'] = $heureLastNotificationServeur;
                 $notif['heureServeur'] = $heureLastNotificationServeur;
                 $notif['show'] = 'true';
 
                 $query = new DbQuery();
-                $query->select('a.*, c.*, cc.*')
+                $query->select('a.*, c.*')
                     ->from('address', 'a')
                     ->leftJoin('customer', 'c', 'a.id_customer = c.id_customer')
-                    ->leftJoin('customer_comments', 'cc', 'a.id_customer = cc.id_customer' )
                     ->where('a.phone LIKE "%' . substr($lastCall['caller'], 2) . '%"')
-                    ->orderBy('cc.date_posted DESC')
+                    ->orderBy('c.date_upd DESC')
                     ->limit(5);
 
                 $results = Db::getInstance()->executeS($query);
@@ -231,25 +229,46 @@ class AdminKeyyoController extends ModuleAdminController
                 if ($results) {
                     // Création du lien vers la fiche client
                     $tokenLite = Tools::getAdminTokenLite('AdminCustomers');
-                    $link = self::$currentIndex . '&controller=AdminCustomers&id_customer=' . $results[0]['id_customer'] . '&viewcustomer&token=' . $tokenLite;
+                    $link = self::$currentIndex . '&controller=AdminCustomers&id_customer=' . $results['id_customer']
+                        . '&viewcustomer&token=' . $tokenLite;
                     $notif['linkCustomer'] = $link;
 
-                    $notif['callerName'] = strtoupper($results[0]['lastname']) . ' ' . ucfirst($results[0]['firstname']);
+                    $notif['redirectingNumber'] = ($notif['redirectingNumber'] % 2)
+                        ? '+' . $notif['redirectingNumber']
+                        : $notif['redirectingNumber'];
+                    $notif['redirectingNumber'] = wordwrap($notif['redirectingNumber'], 2, " ", 1);
 
-                    $employe = new Employee($results[0]['id_employee']);
+                    $notif['callerName'] = strtoupper($results['lastname']) . ' ' . ucfirst($results['firstname']);
+                    $employe = new Employee($results['id_employee']);
 
-                    foreach ($results as $result) {
-                        $notif['histoMessage'][] = '<tr><td><p>'. $employe->lastname . ' ' . $employe->firstname . '</p><p>'. $result['date_posted'].'</p></td><td>'.$result['comment'].'</td></tr>';
+
+                    $query = new DbQuery();
+                    $query->select('a.*, c.*, cc.*')
+                        ->from('address', 'a')
+                        ->leftJoin('customer', 'c', 'a.id_customer = c.id_customer')
+                        ->leftJoin('customer_comments', 'cc', 'a.id_customer = cc.id_customer')
+                        ->where('a.phone LIKE "%' . substr($lastCall['caller'], 2) . '%"')
+                        ->orderBy('cc.date_posted DESC')
+                        ->limit(5);
+
+                    $resultsComments = Db::getInstance()->executeS($query);
+                    foreach ($resultsComments as $result) {
+                        $notif['histoMessage'][] = '<tr><td><p>' . $employe->lastname . ' ' . $employe->firstname . '</p><p>' . $result['date_posted'] . '</p></td><td>' . $result['comment'] . '</td></tr>';
                     }
 
-                    $notif['dateMessage'] = date('Y-m-d à H:m:s' , substr($notif['heureServeur'], 0, 10));
-
-                    $notif['message'] = 'Numéro trouvé';
+                    $notif['message'] = 'Numéro trouvé.';
                 } else {
                     $notif['message'] = 'Numéro non trouvé.';
 
                 }
 
+                $notif['caller'] = ($notif['caller'] % 2) ? '+' . $notif['caller'] : $notif['caller'];
+                $notif['callee'] = ($notif['callee'] % 2) ? '+' . $notif['callee'] : $notif['callee'];
+                $notif['caller'] = wordwrap($notif['caller'], 2, " ", 1);
+                $notif['callee'] = wordwrap($notif['callee'], 2, " ", 1);
+
+
+                $notif['dateMessage'] = date('Y-m-d à H:m:s', substr($notif['heureServeur'], 0, 10));
                 die(Tools::jsonEncode($notif));
             }
         }

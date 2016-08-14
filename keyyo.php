@@ -313,8 +313,8 @@ class Keyyo extends Module
     public function hookDisplayBackOfficeTop()
     {
         if ($this->context->employee->keyyo_notification_enabled) {
-//            $heureLastCall = '1471011321951';
-            $heureLastCall = 'null';
+            $heureLastCall = '1471081437805';
+//            $heureLastCall = 'null';
             $checkbox = '<bouton id="checkboxAppelsKeyyo" class="list-action-enable action-disabled" url="' . Context::getContext()->link->getAdminLink('AdminKeyyo') . '&ajax=1&action=AffichageAppels" title="disabled" heureLastNotif="' . $heureLastCall . '"><i id="notifKeyyoCheck" class="icon-check hidden"></i><i id="notifKeyyoRemove" class="icon-remove"></i>  Notification d\'appels</bouton>';
             return $checkbox;
         }
