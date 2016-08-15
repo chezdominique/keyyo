@@ -26,7 +26,7 @@
  */
 $(document).ready(function (e) {
 
-    var tempoNotification = 3000;
+    var tempoNotification = 1000;
     var isEnabled = 'disabled';
     var modalKeyyo = $('[data-remodal-id=modal]').remodal();
 
@@ -145,20 +145,20 @@ $(document).ready(function (e) {
         newRow.find('#dateMessage').removeAttr('id').html(data.dateMessage);
         newRow.find('#message').removeAttr('id').html(data.message);
         console.log(data.linkPostComment);
+
+        var id_textarea = 'textarea' + data.heureServeur;
+        newRow.find('#customer_comment_Modal').attr({
+            'value': data.messageHistorique,
+            'id': id_textarea
+        });
+
+        var id_contact = 'select' + data.heureServeur;
+        newRow.find('#id_contactNewCall').attr({
+            'id': id_contact
+        });
+
         if (data.message == 'Numéro trouvé.') {
             newRow.find('#callerName').removeAttr('id').html(data.callerName);
-
-            var id_textarea = 'textarea' + data.heureServeur;
-            newRow.find('#customer_comment_Modal').attr({
-                'value': data.messageHistorique,
-                'id': id_textarea
-            });
-
-            var id_contact = 'select' + data.heureServeur;
-            newRow.find('#id_contactNewCall').attr({
-                'id': id_contact
-            });
-
             newRow.find('#submitCustomerComment').removeAttr('id').attr({
                 'href': data.linkPostComment,
                 'id_customer': data.id_customer,
@@ -195,8 +195,40 @@ $(document).ready(function (e) {
             }
             newRow.find('#histoMessage').removeAttr('id');
         } else {
+
+            newRow.find('#submitCustomerComment').removeAttr('id').attr({
+                'href': data.linkPostComment,
+                'id_customer': data.id_customer,
+                'id_textearea': id_textarea,
+                'id_contact': id_contact
+            }).click(function (e) {
+                e.preventDefault();
+                var link = $(this).attr('href');
+                var id_customer = $(this).attr('id_customer');
+                var comment = $('#' + $(this).attr('id_textearea')).val();
+                var id_contact = $('#' + $(this).attr('id_contact')).val();
+
+                $.ajax({
+                    url: link,
+                    type: 'GET',
+                    data: {
+                        'id_customer' : id_customer,
+                        'id_contact': id_contact,
+                        'comment' : comment
+                    },
+                    dataType: 'json'
+                })
+                    .done(function (data) {
+                        alert(data.message);
+                    })
+                    .fail(function (data) {
+                        alert('Erreur : JS');
+                    });
+            });
+
+
             newRow.find('#tableInformationNewRowCall').remove();
-            newRow.find('#commentaireNewRowCall').remove();
+            newRow.find('#voirFicheClient').removeAttr('id').remove();
             newRow.find('#informationNewRowCall').removeClass('col-md-2', 'col-md-12').removeAttr('id');
         }
 
