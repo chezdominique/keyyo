@@ -293,6 +293,11 @@ class Keyyo extends Module
             $this->context->controller->addJS($this->_path . 'views/js/remodal.js', 'all');
             $this->context->controller->addJS($this->_path . 'views/js/adminkeyyo.js', 'all');
 
+            $id_employee = $this->context->employee->id;
+            $this->smarty->assign(array(
+                'contacts' => Contact::getContacts($this->context->language->id),
+            ));
+
             $modal = $this->display(__FILE__, 'modalKeyyo.tpl');
             return $modal;
         }

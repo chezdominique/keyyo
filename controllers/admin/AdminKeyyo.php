@@ -258,7 +258,7 @@ class AdminKeyyoController extends ModuleAdminController
                     foreach ($resultsComments as $result) {
                         $employe = new Employee($result['id_employee']);
 
-                        $notif['histoMessage'][] = '<tr><td><p>'. $employe->firstname[0] .'. '. $employe->lastname
+                        $notif['histoMessage'][] = '<tr><td><p>' . $employe->firstname[0] . '. ' . $employe->lastname
                             . '</p><p>' . $result['date_posted'] . '</p></td><td>' . $result['comment'] . '</td></tr>';
                     }
 
@@ -325,32 +325,57 @@ class AdminKeyyoController extends ModuleAdminController
 
     public function ajaxProcessKeyyoComment()
     {
+        $req_cm = true;
+        $employee = $this->context->employee;
+        $id_contact = Tools::getValue('id_contact');
+
         $comment = array(
             'id_customer' => Tools::getValue('id_customer'),
-            'id_employee' => '2', // Tools::getValue('id_employee'),
-            'comment' => Tools::getValue('comment')
+            'id_employee' => $employee->id,
+            'comment' => Tools::getValue('comment'),
         );
 
         if (!Validate::isInt($comment['id_customer']) or
-            !Validate::isInt($comment['id_employee']) or
-            !Validate::isGenericName($comment['comment']) or
-            empty($comment['id_employee']) or
+            !Validate::isInt($id_contact) or
+            !Validate::isCleanHtml($comment['comment']) or
             empty($comment['id_customer']) or
             empty($comment['comment'])
         ) {
             die(Tools::jsonEncode(array(
-                'message' => 'Erreur',
-                '1' => $comment['id_employee'],
-                '2' => $comment['id_customer']
+                'message' => 'Erreur : Controller',
             )));
         }
 
+        // Ajoute un message dans l'historique des contacts
         $req = Db::getInstance()->insert('customer_comments', $comment);
 
-        if ($req) {
-            die(Tools::jsonEncode(array('message' => 'Commentaire ajouté')));
-        } else {
+        // Ajoute un message dans la partie SAV si un contact à été choisi
+        if ($id_contact != 0) {
+            $ct = new CustomerThread();
+            $ct->id_shop = (int)$this->context->shop->id;
+            $ct->id_contact = (int)$id_contact;
+            $ct->id_lang = (int)$this->context->language->id;
+            $ct->email = $employee->email;
+            $ct->status = 'open';
+            $ct->token = Tools::passwdGen(12);
+            $ct->add();
+
+            if ($ct->id) {
+                $cm = new CustomerMessage();
+                $cm->id_customer_thread = $ct->id;
+                $cm->message = $comment['comment'];
+                $cm->ip_address = (int)ip2long(Tools::getRemoteAddr());
+                $cm->user_agent = $_SERVER['HTTP_USER_AGENT'];
+                $req_cm = $cm->add();
+            }
+        }
+
+
+
+        if (!$req or !$req_cm) {
             die(Tools::jsonEncode(array('message' => 'Il y a eu une erreur')));
+        } else {
+            die(Tools::jsonEncode(array('message' => 'Commentaire ajouté')));
         }
 
 

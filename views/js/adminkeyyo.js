@@ -154,24 +154,29 @@ $(document).ready(function (e) {
                 'id': id_textarea
             });
 
+            var id_contact = 'select' + data.heureServeur;
+            newRow.find('#id_contactNewCall').attr({
+                'id': id_contact
+            });
+
             newRow.find('#submitCustomerComment').removeAttr('id').attr({
                 'href': data.linkPostComment,
                 'id_customer': data.id_customer,
-                'id_employee': data.id_employee,
-                'id_textearea': id_textarea
+                'id_textearea': id_textarea,
+                'id_contact': id_contact
             }).click(function (e) {
                 e.preventDefault();
                 var link = $(this).attr('href');
                 var id_customer = $(this).attr('id_customer');
-                var id_employee = $(this).attr('id_employee');
                 var comment = $('#' + $(this).attr('id_textearea')).val();
+                var id_contact = $('#' + $(this).attr('id_contact')).val();
 
                 $.ajax({
                     url: link,
                     type: 'GET',
                     data: {
                     'id_customer' : id_customer,
-                    'id_employee' : id_employee,
+                    'id_contact': id_contact,
                     'comment' : comment
                     },
                     dataType: 'json'
@@ -180,7 +185,7 @@ $(document).ready(function (e) {
                         alert(data.message);
                     })
                     .fail(function (data) {
-                        alert('Erreur :');
+                        alert('Erreur : JS');
                     });
             });
             newRow.find('#voirFicheClient').removeAttr('id').attr('href', data.linkCustomer);
@@ -197,22 +202,4 @@ $(document).ready(function (e) {
 
         newRow.appendTo('#mainModalKeyyo').slideDown().attr('id', data.heureServeur);
     }
-
-
-    $('.submitCustomerComment').click(function (e) {
-        e.preventDefault();
-        var link = $(this).attr('href');
-        $.ajax({
-            url: link,
-            type: 'GET',
-            dataType: 'json'
-        })
-            .done(function (data) {
-                alert(data.msg);
-            })
-            .fail(function (data) {
-                alert('Erreur : KEYYO refuse l\'appel.');
-            });
-    });
-
 });
