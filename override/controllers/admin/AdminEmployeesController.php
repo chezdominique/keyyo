@@ -22,11 +22,6 @@
 */
 class AdminEmployeesController extends AdminEmployeesControllerCore
 {
-    /*
-	* module: keyyo
-	* date: 2016-08-12 09:56:57
-	* version: 1.0.0
-	*/
     public function __construct()
     {
         parent::__construct();
@@ -44,11 +39,7 @@ class AdminEmployeesController extends AdminEmployeesControllerCore
                 'type' => 'bool', 'class' => 'fixed-width-sm'),
         );
     }
-    /*
-	* module: keyyo
-	* date: 2016-08-12 09:56:57
-	* version: 1.0.0
-	*/
+
     public function renderForm()
     {
 

@@ -259,6 +259,8 @@ class AdminKeyyoController extends ModuleAdminController
                         . ' Numéro : ' . wordwrap('+'.$notif['caller'], 2, " ", 1);
                     $notif['message'] = 'Numéro trouvé.';
                 } else {
+                    $notif['messageHistorique'] = 'Appel du : ' . wordwrap('+'.$notif['caller'], 2, " ", 1).' à '
+                        . date('H:i:s \l\e d-m-Y', substr($notif['heureServeur'], 0, 10));
                     $notif['message'] = 'Numéro non trouvé.';
                 }
 
@@ -276,7 +278,7 @@ class AdminKeyyoController extends ModuleAdminController
                 $notif['linkPostComment'] = self::$currentIndex . '&controller=AdminKeyyo&ajax=1&action=KeyyoComment&token='
                     . $tokenLiteComment;
 
-                $notif['dateMessage'] = date('Y-m-d à H:m:s', substr($notif['heureServeur'], 0, 10));
+                $notif['dateMessage'] = date('Y-m-d à H:i:s', substr($notif['heureServeur'], 0, 10));
                 die(Tools::jsonEncode($notif));
             }
         }

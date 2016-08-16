@@ -96,13 +96,12 @@ class Keyyo extends Module
     public function alterEmployeeTable($method = 'add')
     {
         if ($method == 'add') {
-            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'employee 
-            ADD `keyyo_caller` VARCHAR (15) NULL,
+            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'employee
             ADD `keyyo_notification_enabled` BOOL DEFAULT FALSE,
             ADD `keyyo_notification_numbers` VARCHAR (255) NULL
             ';
         } else {
-            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'employee 
+            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'employee
             DROP COLUMN `keyyo_caller`,
             DROP COLUMN `keyyo_notification_enabled`,
             DROP COLUMN `keyyo_notification_numbers`
@@ -117,7 +116,6 @@ class Keyyo extends Module
 
     public function createNotificationKeyyoTable()
     {
-        return true;
         $sql = 'CREATE TABLE `' . _DB_PREFIX_ . $this->tableName . '` (
             `id_notification_keyyo` INT (12) NOT NULL AUTO_INCREMENT,
             `account` VARCHAR (32) NULL,
@@ -148,9 +146,9 @@ class Keyyo extends Module
 
     private function removeNotificationKeyyoTable()
     {
-        return true;
-        if (!Db::getInstance()->Execute('DROP TABLE `' . _DB_PREFIX_ . $this->tableName . '`'))
+        if (!Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . $this->tableName . '`')) {
             return false;
+        }
         return true;
     }
 
@@ -285,15 +283,16 @@ class Keyyo extends Module
 
     public function hookDisplayBackOfficeHeader()
     {
+        $this->context->controller->addJquery();
+        $this->context->controller->addJS($this->_path . 'views/js/jquery.cookie.js', 'all');
+        $this->context->controller->addJS($this->_path . 'views/js/remodal.js', 'all');
+        $this->context->controller->addJS($this->_path . 'views/js/adminkeyyo.js', 'all');
+            $this->context->controller->addCSS($this->_path . 'views/css/bootstrap.css', 'all');
         if ($this->context->employee->keyyo_notification_enabled) {
-            $this->context->controller->addJquery();
             $this->context->controller->addCSS($this->_path . 'views/css/remodal.css', 'all');
             $this->context->controller->addCSS($this->_path . 'views/css/remodal-default-theme.css', 'all');
-            $this->context->controller->addCSS($this->_path . 'views/css/bootstrap.css', 'all');
             $this->context->controller->addCSS($this->_path . 'views/css/adminkeyyo.css', 'all');
-            $this->context->controller->addJS($this->_path . 'views/js/jquery.cookie.js', 'all');
-            $this->context->controller->addJS($this->_path . 'views/js/remodal.js', 'all');
-            $this->context->controller->addJS($this->_path . 'views/js/adminkeyyo.js', 'all');
+
 
             $id_employee = $this->context->employee->id;
             $this->smarty->assign(array(
@@ -320,8 +319,8 @@ class Keyyo extends Module
     public function hookDisplayBackOfficeTop()
     {
         if ($this->context->employee->keyyo_notification_enabled) {
-            $heureLastCall = '1471081437805';
-//            $heureLastCall = 'null';
+//            $heureLastCall = '1471081437805';
+            $heureLastCall = 'null';
             $checkbox = '<bouton id="checkboxAppelsKeyyo" class="list-action-enable action-disabled" url="' . Context::getContext()->link->getAdminLink('AdminKeyyo') . '&ajax=1&action=AffichageAppels" title="disabled" heureLastNotif="' . $heureLastCall . '"><i id="notifKeyyoCheck" class="icon-check hidden"></i><i id="notifKeyyoRemove" class="icon-remove"></i>  Notification d\'appels</bouton>';
             return $checkbox;
         }

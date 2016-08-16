@@ -1,3 +1,6 @@
+body {
+    font-size: 16px!important;
+}
 .icon-AdminKeyyo:before{
     content: '';
 }
@@ -55,4 +58,19 @@
 }
 .messagesNewCall {
     margin-bottom: 4px;
+}
+.bootstrap .form-control, .bootstrap input[type="text"], .bootstrap input[type="search"], .bootstrap input[type="password"], .bootstrap textarea, .bootstrap select {
+    font-size: 14px!important;
+}
+
+#noteContent {
+    height: 120px;
+}
+
+#nav-sidebar {
+    font-size: 14px;
+}
+
+.bootstrap .list-action-enable{
+    font-size: 1em;
 }
