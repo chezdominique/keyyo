@@ -287,7 +287,7 @@ class Keyyo extends Module
         $this->context->controller->addJS($this->_path . 'views/js/jquery.cookie.js', 'all');
         $this->context->controller->addJS($this->_path . 'views/js/remodal.js', 'all');
         $this->context->controller->addJS($this->_path . 'views/js/adminkeyyo.js', 'all');
-            $this->context->controller->addCSS($this->_path . 'views/css/bootstrap.css', 'all');
+        $this->context->controller->addCSS($this->_path . 'views/css/bootstrap.css', 'all');
         if ($this->context->employee->keyyo_notification_enabled) {
             $this->context->controller->addCSS($this->_path . 'views/css/remodal.css', 'all');
             $this->context->controller->addCSS($this->_path . 'views/css/remodal-default-theme.css', 'all');
@@ -318,12 +318,22 @@ class Keyyo extends Module
 
     public function hookDisplayBackOfficeTop()
     {
-        if ($this->context->employee->keyyo_notification_enabled) {
+        if ($this->context->controller->tabAccess['class_name'] == 'AdminKeyyo') {
+            if ($this->context->employee->keyyo_notification_enabled) {
             $heureLastCall = '1471081437805';
-//            $heureLastCall = 'null';
-            $checkbox = '<bouton id="checkboxAppelsKeyyo" class="list-action-enable action-disabled" url="' . Context::getContext()->link->getAdminLink('AdminKeyyo') . '&ajax=1&action=AffichageAppels" title="disabled" heureLastNotif="' . $heureLastCall . '"><i id="notifKeyyoCheck" class="icon-check hidden"></i><i id="notifKeyyoRemove" class="icon-remove"></i>  Notification d\'appels</bouton>';
-            return $checkbox;
+//                $heureLastCall = 'null';
+                $checkbox = '<button id="checkboxAppelsKeyyo" class="list-action-enable action-disabled" url="';
+                $checkbox .= Context::getContext()->link->getAdminLink('AdminKeyyo') . '&ajax=1&action=AffichageAppels"';
+                $checkbox .= 'title="disabled" heureLastNotif="' . $heureLastCall . '"><i id="notifKeyyoCheck" ';
+                $checkbox .= 'class="icon-check hidden"></i><i id="notifKeyyoRemove" class="icon-remove">';
+                $checkbox .= '</i>  Notification d\'appels</button>';
+
+                $btnRappelModal ='  <button id="rappelModal" type="button" class="btn btn-info">Rappel Fenêtre</button>';
+
+                return $checkbox . $btnRappelModal;
+            }
         }
+
         return false;
     }
 

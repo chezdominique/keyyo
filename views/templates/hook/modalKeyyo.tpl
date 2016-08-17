@@ -51,16 +51,14 @@
                             </select>
                             <textarea class="form-control textareaMessagesNewCall" name="customer_comment"
                                       id="customer_comment_Modal"></textarea>
-                            <button href="#" id="submitCustomerComment" type="submit" class="btn btn-info input-block-level form-control submitCustomerComment" name="submitCustomerComment">Ajouter un
-                                commentaire
-                            </button>
+                            <button href="#" id="submitCustomerComment" type="submit" class="btn btn-info input-block-level form-control submitCustomerComment" name="submitCustomerComment">Transmettre le message</button>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
 
-        <a id="voirFicheClient" href="#" class="remodal-confirm remodal-confirm-link" role="button">Voir fiche
+        <a id="voirFicheClient" target="_blank" href="#" class="remodal-confirm remodal-confirm-link" role="button">Voir fiche
             client</a>
         <button href="#" id="fermerAppel" class="remodal-cancel remodal-cancel-link">Fermer</button>
     </div>

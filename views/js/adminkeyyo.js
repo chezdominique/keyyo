@@ -26,7 +26,7 @@
  */
 $(document).ready(function (e) {
 
-    var tempoNotification = 4000;
+    var tempoNotification = 1000;
     var isEnabled = 'disabled';
     var modalKeyyo = $('[data-remodal-id=modal]').remodal();
 
@@ -63,11 +63,6 @@ $(document).ready(function (e) {
         isEnabled = $('#checkboxAppelsKeyyo').attr('title');
         link = $('#checkboxAppelsKeyyo').attr('url') + '&isEnabled=' + isEnabled;
         get_fb_complete(link);
-    });
-
-    // Vide la liste des appels de la fenetre modale lors de sa fermeture
-    $(document).on('closing', '.remodal', function (e) {
-        $('#mainModalKeyyo').empty();
     });
 
 
@@ -124,42 +119,46 @@ $(document).ready(function (e) {
         } else {
             heureLastNotif = data.heureServeur;
             $('#checkboxAppelsKeyyo').attr('heureLastNotif', heureLastNotif);
-            console.log(data.message);
         }
     }
+
+    $('#rappelModal').click(function (e) {
+        modalKeyyo.open();
+    })
+
 
     // Crée le contenu d'un nouvel appel qui sera intégré dans la fenetre modale
     function nouvelAppel(data) {
         d = new Date(data.heureServeur * 1000);
         heureAppel = d.getHours() + ' : ' + d.getMinutes();
-
+        var idHeureServeur = data.heureServeur;
         var newRow = $('#newRowCall')
             .clone();
 
-        newRow.find('#fermerAppel').attr('id', data.heureServeur).click(function (e) {
-            newRow.slideUp("slow")
+        newRow.find('#fermerAppel').attr('id', idHeureServeur).click(function (e) {
+            newRow.slideUp("slow").remove();
+            closeModal();
         });
         newRow.find('#caller').removeAttr('id').html(data.caller);
         newRow.find('#redirectingNumber').removeAttr('id').html(data.redirectingNumber);
         newRow.find('#callee').removeAttr('id').html(data.callee);
         newRow.find('#dateMessage').removeAttr('id').html(data.dateMessage);
-        newRow.find('#message').removeAttr('id').html(data.message);
-        console.log(data.linkPostComment);
+        newRow.find('#message').attr('id', 'message' + idHeureServeur).html(data.message);
 
-        var id_textarea = 'textarea' + data.heureServeur;
+        var id_textarea = 'textarea' + idHeureServeur;
         newRow.find('#customer_comment_Modal').attr({
             'value': data.messageHistorique,
             'id': id_textarea
         });
 
-        var id_contact = 'select' + data.heureServeur;
+        var id_contact = 'select' + idHeureServeur;
         newRow.find('#id_contactNewCall').attr({
             'id': id_contact
         });
 
         if (data.message == 'Numéro trouvé.') {
 
-            var historique_contact = 'historique_contact' + data.heureServeur;
+            var historique_contact = 'historique_contact' + idHeureServeur;
             newRow.find('#historique_contact').attr({
                 'id': historique_contact
             });
@@ -183,18 +182,18 @@ $(document).ready(function (e) {
                     url: link,
                     type: 'GET',
                     data: {
-                    'id_customer' : id_customer,
-                    'id_contact': id_contact,
-                    'comment' : comment,
-                    'historique_contact' : historique_contact
+                        'id_customer': id_customer,
+                        'id_contact': id_contact,
+                        'comment': comment,
+                        'historique_contact': historique_contact
                     },
                     dataType: 'json'
                 })
                     .done(function (data) {
-                        alert(data.message);
+                        messageDone(data.message, idHeureServeur);
                     })
                     .fail(function (data) {
-                        alert('Erreur : JS');
+                        messageFail(data.message, idHeureServeur)
                     });
             });
             newRow.find('#voirFicheClient').removeAttr('id').attr('href', data.linkCustomer);
@@ -221,17 +220,17 @@ $(document).ready(function (e) {
                     url: link,
                     type: 'GET',
                     data: {
-                        'id_customer' : id_customer,
+                        'id_customer': id_customer,
                         'id_contact': id_contact,
-                        'comment' : comment
+                        'comment': comment
                     },
                     dataType: 'json'
                 })
                     .done(function (data) {
-                        alert(data.message);
+                        messageDone(data.message, idHeureServeur);
                     })
                     .fail(function (data) {
-                        alert('Erreur : JS');
+                        messageFail(data.message, idHeureServeur)
                     });
             });
 
@@ -241,6 +240,30 @@ $(document).ready(function (e) {
             newRow.find('#informationNewRowCall').removeClass('col-md-2', 'col-md-12').removeAttr('id');
         }
 
-        newRow.appendTo('#mainModalKeyyo').slideDown().attr('id', data.heureServeur);
+        newRow.appendTo('#mainModalKeyyo').slideDown().attr('id', idHeureServeur);
     }
+
+    function messageDone(message, idHeureServeur) {
+        if (message == 'ok') {
+            $('#' + idHeureServeur).slideUp("slow").remove('#' + idHeureServeur);
+            closeModal();
+        } else if (message == '1') {
+            $('#' + 'message' + idHeureServeur).html('<p class="bg-danger text-danger">Veuillez choisir un destinataire</p>');
+        } else if (message == '2') {
+            $('#' + 'message' + idHeureServeur).html('<p class="bg-danger text-danger">Erreur lors de l\'enregistrement</p>');
+        } else {
+            $('#' + 'message' + idHeureServeur).html('<p class="bg-danger text-danger">Erreur inconnue</p>');
+        }
+    }
+
+    function closeModal() {
+        if ($('#mainModalKeyyo').find('div').length == 0 ){
+            modalKeyyo.close();
+        }
+    }
+
+    function messageFail(message, idHeureServeur) {
+        $('#' + 'message' + idHeureServeur).html('<p class="bg-danger text-danger">Pas de réponse du serveur</p>');
+    }
+
 });

@@ -351,12 +351,12 @@ class AdminKeyyoController extends ModuleAdminController
 
         if (!$id_contact && empty($historique_contact)) {
             die(Tools::jsonEncode(array(
-                'message' => 'Erreur : Pas de destinataire choisi.',
+                'message' => '1',
             )));
         }
 
         // Ajoute un message dans l'historique des contacts
-        if ($comment['id_customer'] && empty($historique_contact)) {
+        if ($comment['id_customer'] && $historique_contact) {
             $req = Db::getInstance()->insert('customer_comments', $comment);
         }
 
@@ -373,19 +373,17 @@ class AdminKeyyoController extends ModuleAdminController
 
             if ($ct->id) {
                 $cm = new CustomerMessage();
-                $cm->id_customer_thread = $ct->id;
+                $cm->id_customer_thread = (int)$ct->id;
                 $cm->message = $comment['comment'];
-                $cm->ip_address = (int)ip2long(Tools::getRemoteAddr());
-                $cm->user_agent = $_SERVER['HTTP_USER_AGENT'];
                 $req_cm = $cm->add();
             }
         }
 
 
         if (!$req or !$req_cm) {
-            die(Tools::jsonEncode(array('message' => 'Il y a eu une erreur')));
+            die(Tools::jsonEncode(array('message' => '2')));
         } else {
-            die(Tools::jsonEncode(array('message' => 'Commentaire ajouté')));
+            die(Tools::jsonEncode(array('message' => 'ok')));
         }
 
 
