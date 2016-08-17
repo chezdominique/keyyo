@@ -125,19 +125,34 @@ class AdminKeyyoController extends ModuleAdminController
 
     public function ajaxProcessKeyyoCall()
     {
-
+        $log = array();
         $keyyo_url = Configuration::get('KEYYO_URL');
         $account = $this->context->employee->getKeyyoCaller();
         $callee = Validate::isString(Tools::getValue('CALLEE')) ? Tools::getValue('CALLEE') : '';
         $calle_name = Validate::isString(Tools::getValue('CALLE_NAME')) ? Tools::getValue('CALLE_NAME') : '';
 
+        $log = array(
+            'keyyo_url' => $keyyo_url,
+            'account' => $account,
+            'callee' => $callee,
+            'calle_name' => $calle_name,
+            'erreur' => '',
+            'keyyo_link' => '',
+            'retour_keyyo' => '',
+            'heure' => date('H:i:s d-m-Y')
+        );
+
         if (!$account) {
             $return = Tools::jsonEncode(array('msg' => 'Veuillez configurer votre numéro de compte KEYYO.'));
+            $log['erreur'] = $return;
+            $this->logKeyyo($log);
             die($return);
         }
 
         if (!$callee || !$calle_name) {
             $return = Tools::jsonEncode(array('msg' => 'Il manque une information pour composer le numéro.'));
+            $log['erreur'] = $return;
+            $this->logKeyyo($log);
             die($return);
         } else {
             $keyyo_link = $keyyo_url . '?ACCOUNT=' . $account;
@@ -148,14 +163,29 @@ class AdminKeyyoController extends ModuleAdminController
             $buffer = fgets($fp, 4096);
             fclose($fp);
 
+            $log['keyyo_link'] = $keyyo_link;
+            $log['retour_keyyo'] = $buffer;
+
             if ($buffer == 'OK') {
                 $return = Tools::jsonEncode(array('msg' => 'Appel du ' . $callee . ' en cours.'));
+                $log['erreur'] = $return;
+                $this->logKeyyo($log);
                 die($return);
             } else {
                 $return = Tools::jsonEncode(array('msg' => 'Problème lors de l\'appel.'));
+                $log['erreur'] = $return;
+                $this->logKeyyo($log);
                 die($return);
             }
         }
+    }
+
+    public function logKeyyo($log)
+    {
+        $f = Tools::jsonEncode($log);
+        $file = fopen(_PS_MODULE_DIR_ .'/logKeyyo.txt', 'a+');
+        fwrite($file, $f . PHP_EOL);
+        fclose($file);
     }
 
     private function sanitizePhoneNumber($number)
@@ -172,10 +202,6 @@ class AdminKeyyoController extends ModuleAdminController
 
     public function ajaxProcessAffichageAppels()
     {
-        // Verifier si l'employé veut les notifications et sur quels numeros
-        // Verifier si il y a une heure de demande et quel heure si pas d'heure, renvoyer desuite l'heure actuelle
-        // si la demande est plus ancienne que
-
         $notif = array(
             'show' => 'true',
             'heureClient' => '',

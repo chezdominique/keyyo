@@ -20,7 +20,7 @@
                 <td><strong>Appel du :</strong> <span id="caller" class="pull-right"></span></td>
             </tr>
             <tr>
-                <td><strong>Renvoie du :</strong><span id="redirectingNumber" class="pull-right"></span></td>
+                <td><strong>Renvoi du :</strong><span id="redirectingNumber" class="pull-right"></span></td>
             </tr>
             <tr>
                 <td><strong>Pour le :</strong><span id="callee" class="pull-right"></span></td>
@@ -38,11 +38,6 @@
                 <form action="" method="post" id="sendCommentModal">
                     <div class="form-group">
                         <div class="col-md-12">
-                            <div class="checkbox">
-                                <label>
-                                    <input id="historique_contact" name="historique_contact" type="checkbox"> Ajouter à l'historique de contact
-                                </label>
-                            </div>
                             <select id="id_contactNewCall" class="form-control" name="id_contact">
                                 <option value="0">{l s='-- Choisissez --'}</option>
                                 {foreach from=$contacts item=contact}
@@ -51,6 +46,11 @@
                             </select>
                             <textarea class="form-control textareaMessagesNewCall" name="customer_comment"
                                       id="customer_comment_Modal"></textarea>
+                            <div class="checkbox">
+                                <label>
+                                    <input id="historique_contact" name="historique_contact" type="checkbox"> Ajouter également à l'historique de contact
+                                </label>
+                            </div>
                             <button href="#" id="submitCustomerComment" type="submit" class="btn btn-info input-block-level form-control submitCustomerComment" name="submitCustomerComment">Transmettre le message</button>
                         </div>
                     </div>

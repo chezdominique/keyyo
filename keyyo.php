@@ -29,6 +29,8 @@
  */
 class Keyyo extends Module
 {
+    // URL de notification à entrée dans KEYYO manager
+    // http://www.l-et-sens.com/module/keyyo/notificationskeyyo?account=_ACCOUNT_&caller=_CALLER_&callee=_CALLEE_&type=_N_TYPE_&callref=_CALLREF_&version=_N_VERSION_&dref=_DREF_&drefreplace=_DREF_REPLACE_&sessionid=_SESSION_ID_&isacd=_IS_ACD_&redirectingnumber=_REDIRECTING_NUMBER_&tsms=_TSMS_
     protected $tabName;
     protected $errors = array();
     protected $html = '';
