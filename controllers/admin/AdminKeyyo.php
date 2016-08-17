@@ -191,7 +191,8 @@ class AdminKeyyoController extends ModuleAdminController
             'messageHistorique' => '',
             'id_customer' => '',
             'id_employee' => '',
-            'linkPostComment' => ''
+            'linkPostComment' => '',
+            'historique_contact' => ''
         );
 
         // Est-ce que l'employé peut afficher les notifications ?
@@ -208,6 +209,7 @@ class AdminKeyyoController extends ModuleAdminController
         $listeNumerosAcceptes = explode(',', $this->context->employee->keyyo_notification_numbers);
         $heureLastNotificationCient = Tools::getValue('heureLN');
         $heureLastNotificationServeur = $lastCall['tsms'];
+
 
         // Est-ce que le numéro appelé fait partir des numéros surveiller par l'employé ?
         if (in_array($notif['callee'], $listeNumerosAcceptes)) {
@@ -256,10 +258,10 @@ class AdminKeyyoController extends ModuleAdminController
 
                     $notif['messageHistorique'] = 'Appel de ' . $notif['callerName'] . ' à '
                         . date('H:i:s \l\e d-m-Y', substr($notif['heureServeur'], 0, 10))
-                        . ' Numéro : ' . wordwrap('+'.$notif['caller'], 2, " ", 1);
+                        . ' Numéro : ' . wordwrap('+' . $notif['caller'], 2, " ", 1);
                     $notif['message'] = 'Numéro trouvé.';
                 } else {
-                    $notif['messageHistorique'] = 'Appel du : ' . wordwrap('+'.$notif['caller'], 2, " ", 1).' à '
+                    $notif['messageHistorique'] = 'Appel du : ' . wordwrap('+' . $notif['caller'], 2, " ", 1) . ' à '
                         . date('H:i:s \l\e d-m-Y', substr($notif['heureServeur'], 0, 10));
                     $notif['message'] = 'Numéro non trouvé.';
                 }
@@ -330,6 +332,7 @@ class AdminKeyyoController extends ModuleAdminController
         $req = true;
         $employee = $this->context->employee;
         $id_contact = Tools::getValue('id_contact');
+        $historique_contact = Tools::getValue('historique_contact');
 
         $comment = array(
             'id_customer' => Tools::getValue('id_customer'),
@@ -346,15 +349,14 @@ class AdminKeyyoController extends ModuleAdminController
             )));
         }
 
-        if (!$id_contact && !$comment['id_customer']) {
+        if (!$id_contact && empty($historique_contact)) {
             die(Tools::jsonEncode(array(
                 'message' => 'Erreur : Pas de destinataire choisi.',
             )));
         }
 
-
         // Ajoute un message dans l'historique des contacts
-        if ($comment['id_customer']) {
+        if ($comment['id_customer'] && empty($historique_contact)) {
             $req = Db::getInstance()->insert('customer_comments', $comment);
         }
 

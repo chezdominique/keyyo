@@ -38,6 +38,11 @@
                 <form action="" method="post" id="sendCommentModal">
                     <div class="form-group">
                         <div class="col-md-12">
+                            <div class="checkbox">
+                                <label>
+                                    <input id="historique_contact" name="historique_contact" type="checkbox"> Ajouter à l'historique de contact
+                                </label>
+                            </div>
                             <select id="id_contactNewCall" class="form-control" name="id_contact">
                                 <option value="0">{l s='-- Choisissez --'}</option>
                                 {foreach from=$contacts item=contact}

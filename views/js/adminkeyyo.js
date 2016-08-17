@@ -26,7 +26,7 @@
  */
 $(document).ready(function (e) {
 
-    var tempoNotification = 1000;
+    var tempoNotification = 4000;
     var isEnabled = 'disabled';
     var modalKeyyo = $('[data-remodal-id=modal]').remodal();
 
@@ -158,18 +158,26 @@ $(document).ready(function (e) {
         });
 
         if (data.message == 'Numéro trouvé.') {
+
+            var historique_contact = 'historique_contact' + data.heureServeur;
+            newRow.find('#historique_contact').attr({
+                'id': historique_contact
+            });
+
             newRow.find('#callerName').removeAttr('id').html(data.callerName);
             newRow.find('#submitCustomerComment').removeAttr('id').attr({
                 'href': data.linkPostComment,
                 'id_customer': data.id_customer,
                 'id_textearea': id_textarea,
-                'id_contact': id_contact
+                'id_contact': id_contact,
+                'historique_contact': historique_contact
             }).click(function (e) {
                 e.preventDefault();
                 var link = $(this).attr('href');
                 var id_customer = $(this).attr('id_customer');
                 var comment = $('#' + $(this).attr('id_textearea')).val();
                 var id_contact = $('#' + $(this).attr('id_contact')).val();
+                var historique_contact = $('#' + $(this).attr('historique_contact')).attr('checked');
 
                 $.ajax({
                     url: link,
@@ -177,7 +185,8 @@ $(document).ready(function (e) {
                     data: {
                     'id_customer' : id_customer,
                     'id_contact': id_contact,
-                    'comment' : comment
+                    'comment' : comment,
+                    'historique_contact' : historique_contact
                     },
                     dataType: 'json'
                 })
@@ -226,7 +235,7 @@ $(document).ready(function (e) {
                     });
             });
 
-
+            newRow.find('#historique_contact').parent().remove();
             newRow.find('#tableInformationNewRowCall').remove();
             newRow.find('#voirFicheClient').removeAttr('id').remove();
             newRow.find('#informationNewRowCall').removeClass('col-md-2', 'col-md-12').removeAttr('id');
