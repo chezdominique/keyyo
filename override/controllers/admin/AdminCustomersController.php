@@ -396,6 +396,9 @@ class AdminCustomersController extends AdminCustomersControllerCore
 
             $display_message = ($ln != 10 && $ln > 0) ? '<i class="icon-warning text-danger"></i>' : '';
 
+            $params['lastname'] = str_replace(' ', '_', trim($params['lastname']));
+            $params['firstname'] = str_replace(' ', '_', trim($params['firstname']));
+
             $keyyo_link .= $display_message . ' <a href="' . Context::getContext()->link->getAdminLink('AdminCustomers');
             $keyyo_link .= '&ajax=1&action=KeyyoCall';
             $keyyo_link .= '&CALLEE=' . $NumberK;

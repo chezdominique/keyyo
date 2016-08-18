@@ -84,8 +84,29 @@ class NotificationKeyyoClass extends ObjectModel
      */
     public $type;
 
+    public $id_employee;
+
     public static $definition = array(
-        'table' => _DB_PREFIX_.'notification_keyyo',
+        'table' => 'notification_keyyo',
         'primary' => 'id_notification_keyyo',
+        'fields' => array(
+            'account' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'callee' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'caller' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'calle_name' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'callref' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'dref' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'drefreplace' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'isacd' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'msg' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'profil' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'record' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'redirectingnumber' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'sessionid' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'version' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'tsms' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'type' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'id_employee' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+        ),
     );
 }
