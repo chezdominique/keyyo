@@ -54,16 +54,21 @@ class AdminKeyyoController extends ModuleAdminController
                 'align' => 'center',
                 'class' => 'fixed-width-xs'),
             'account' => array(
-                'title' => $this->l('Compte'),
+                'title' => $this->l('N° KEYYO'),
                 'class' => 'col-md-1',
             ),
             'caller' => array(
-                'title' => $this->l('Du'),
+                'title' => $this->l('Appel du'),
                 'class' => 'col-md-1',
             ),
             'callee' => array(
                 'title' => $this->l('Pour le'),
                 'class' => 'col-md-1',
+            ),
+            'redirectingnumber' => array(
+                'title' => $this->l('Renvoi de'),
+                'class' => 'col-md-1',
+                'callback' => 'whoIsNumber'
             ),
             'tsms' => array(
                 'title' => $this->l('Heure'),
@@ -277,7 +282,7 @@ class AdminKeyyoController extends ModuleAdminController
         $lastCall = $this->getHeureLastCall();
         $notif['caller'] = $lastCall['caller'];
         $notif['callee'] = $lastCall['callee'];
-        $notif['redirectingNumber'] = ($lastCall['redirectingnumber']) ? $lastCall['redirectingnumber'] : '';
+        $notif['redirectingNumber'] = $this->whoIsNumber($lastCall['redirectingnumber']);
 
         $listeNumerosAcceptes = explode(',', $this->context->employee->keyyo_notification_numbers);
         $heureLastNotificationCient = Tools::getValue('heureLN');
@@ -463,4 +468,21 @@ class AdminKeyyoController extends ModuleAdminController
 
     }
 
+    public function whoIsNumber($number = '.')
+    {
+        $query = new DbQuery();
+
+        $query  ->select('e.lastname, e.firstname')
+                ->from('employee', 'e')
+                ->where('e.keyyo_caller = "' . $number .'"' );
+
+        $result = Db::getInstance()->getRow($query);
+
+        if ($result) {
+            return strtoupper($result['lastname']) . ' ' . substr($result['firstname'],0,1) .'.';
+        } else {
+            return $number;
+        }
+
+    }
 }

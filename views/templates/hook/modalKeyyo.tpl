@@ -20,7 +20,7 @@
                 <td><strong>Appel du :</strong> <span id="caller" class="pull-right"></span></td>
             </tr>
             <tr>
-                <td><strong>Renvoi du :</strong><span id="redirectingNumber" class="pull-right"></span></td>
+                <td><strong>Renvoi :</strong><span id="redirectingNumber" class="pull-right"></span></td>
             </tr>
             <tr>
                 <td><strong>Pour le :</strong><span id="callee" class="pull-right"></span></td>
