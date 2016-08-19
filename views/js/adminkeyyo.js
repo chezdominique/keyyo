@@ -32,6 +32,14 @@ $(document).ready(function (e) {
 
     // Appel Keyyo
     $('.keyyo_link').parent().attr('onclick', '').css('cursor', 'text');
+
+    // Rappel modal number
+    $('.numberCaller').click(function (e) {
+        e.preventDefault();
+        get_fb_rappel($(this).find('.linkRappel').attr('href'));
+    });
+
+
     $('.keyyo_link').click(function (e) {
         e.preventDefault();
         var link = $(this).attr('href');
@@ -86,6 +94,22 @@ $(document).ready(function (e) {
         }
     }
 
+    // Affiche un numero en particulier
+    function get_fb_rappel(href) {
+        $.ajax({
+            type: "GET",
+            url: href,
+            dataType: 'json'
+        }).done(function (data) {
+            nouvelAppel(data);
+            if (modalKeyyo.getState() == 'closed') {
+                modalKeyyo.open();
+            }
+        });
+
+    }
+
+
     // Fait la requete cyclique pour savoir si il y a de nouveau appels
     function get_fb_complete(link) {
 
@@ -129,6 +153,7 @@ $(document).ready(function (e) {
 
     // Crée le contenu d'un nouvel appel qui sera intégré dans la fenetre modale
     function nouvelAppel(data) {
+        console.log(data.dref); // TODO reprendre ici, integre dref dans la fentre modale
         d = new Date(data.heureServeur * 1000);
         heureAppel = d.getHours() + ' : ' + d.getMinutes();
         var idHeureServeur = data.heureServeur;
@@ -257,7 +282,7 @@ $(document).ready(function (e) {
     }
 
     function closeModal() {
-        if ($('#mainModalKeyyo').find('div').length == 0 ){
+        if ($('#mainModalKeyyo').find('div').length == 0) {
             modalKeyyo.close();
         }
     }

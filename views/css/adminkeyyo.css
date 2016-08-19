@@ -74,3 +74,12 @@ body {
 .bootstrap .list-action-enable{
     font-size: 1em;
 }
+
+#rappelModal {
+    height: 24px;
+    margin-bottom: 2px;
+}
+
+.setType {
+    font-size: 1.4em;
+}

@@ -97,8 +97,10 @@ class Keyyo extends Module
 
     public function alterEmployeeTable($method = 'add')
     {
+        return true;
         if ($method == 'add') {
-            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'employee
+            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'employee 
+            ADD `keyyo_caller` VARCHAR (255) NULL,
             ADD `keyyo_notification_enabled` BOOL DEFAULT FALSE,
             ADD `keyyo_notification_numbers` VARCHAR (255) NULL
             ';
@@ -136,7 +138,7 @@ class Keyyo extends Module
             `version` VARCHAR (32) NULL,
             `tsms` VARCHAR (32) NULL,
             `type` VARCHAR (32) NULL,
-            `id_employee` VARCHAR (32) NULL,
+            `status` BOOL NULL,
             PRIMARY KEY (`id_notification_keyyo`)
         ) ENGINE = ' . _MYSQL_ENGINE_;
 
@@ -289,8 +291,8 @@ class Keyyo extends Module
         $this->context->controller->addJS($this->_path . 'views/js/jquery.cookie.js', 'all');
         $this->context->controller->addJS($this->_path . 'views/js/remodal.js', 'all');
         $this->context->controller->addJS($this->_path . 'views/js/adminkeyyo.js', 'all');
-        $this->context->controller->addCSS($this->_path . 'views/css/bootstrap.css', 'all');
         if ($this->context->employee->keyyo_notification_enabled) {
+            $this->context->controller->addCSS($this->_path . 'views/css/bootstrap.css', 'all');
             $this->context->controller->addCSS($this->_path . 'views/css/remodal.css', 'all');
             $this->context->controller->addCSS($this->_path . 'views/css/remodal-default-theme.css', 'all');
             $this->context->controller->addCSS($this->_path . 'views/css/adminkeyyo.css', 'all');
@@ -322,8 +324,8 @@ class Keyyo extends Module
     {
         if ($this->context->controller->tabAccess['class_name'] == 'AdminKeyyo') {
             if ($this->context->employee->keyyo_notification_enabled) {
-            $heureLastCall = '1471081437805';
-//                $heureLastCall = 'null';
+//            $heureLastCall = '1471081437805';
+                $heureLastCall = 'null';
                 $checkbox = '<button id="checkboxAppelsKeyyo" class="list-action-enable action-disabled" url="';
                 $checkbox .= Context::getContext()->link->getAdminLink('AdminKeyyo') . '&ajax=1&action=AffichageAppels"';
                 $checkbox .= 'title="disabled" heureLastNotif="' . $heureLastCall . '"><i id="notifKeyyoCheck" ';

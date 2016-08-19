@@ -47,6 +47,8 @@ class AdminKeyyoController extends ModuleAdminController
         $this->context = Context::getContext();
         $this->addCSS(_PS_MODULE_DIR_ . 'keyyo/views/css/adminkeyyo.css');
         $this->list_no_link = true;
+        $this->_orderBy = 'id_notification_keyyo';
+        $this->_orderWay = 'DESC';
 
         $this->fields_list = array(
             'id_notification_keyyo' => array(
@@ -57,10 +59,6 @@ class AdminKeyyoController extends ModuleAdminController
                 'title' => $this->l('N° KEYYO'),
                 'class' => 'col-md-1',
             ),
-            'caller' => array(
-                'title' => $this->l('Appel du'),
-                'class' => 'col-md-1',
-            ),
             'callee' => array(
                 'title' => $this->l('Pour le'),
                 'class' => 'col-md-1',
@@ -68,7 +66,7 @@ class AdminKeyyoController extends ModuleAdminController
             'redirectingnumber' => array(
                 'title' => $this->l('Renvoi de'),
                 'class' => 'col-md-1',
-                'callback' => 'whoIsNumber'
+                'callback' => 'whoIsNumber',
             ),
             'tsms' => array(
                 'title' => $this->l('Heure'),
@@ -78,6 +76,13 @@ class AdminKeyyoController extends ModuleAdminController
             'type' => array(
                 'title' => $this->l('Type'),
                 'class' => 'col-md-1',
+                'align' => 'center',
+                'callback' => 'setType'
+            ),
+            'caller' => array(
+                'title' => $this->l('Appel de'),
+                'class' => 'col-md-2 numberCaller',
+                'callback' => 'linkRappel'
             ),
         );
 
@@ -86,13 +91,12 @@ class AdminKeyyoController extends ModuleAdminController
                 'text' => $this->l('Delete selected'),
                 'icon' => 'icon-trash',
                 'confirm' => $this->l('Delete selected items?')
-            )
+            ),
         );
         parent::__construct();
 
         $this->addJquery();
         $this->addJS(_PS_MODULE_DIR_ . 'keyyo/views/js/jquery.cookie.js');
-
     }
 
     public function renderList()
@@ -270,7 +274,8 @@ class AdminKeyyoController extends ModuleAdminController
             'id_customer' => '',
             'id_employee' => '',
             'linkPostComment' => '',
-            'historique_contact' => ''
+            'historique_contact' => '',
+            'dref' => ''
         );
 
         // Est-ce que l'employé peut afficher les notifications ?
@@ -279,11 +284,12 @@ class AdminKeyyoController extends ModuleAdminController
             $notif['show'] = 'false';
             die(Tools::jsonEncode($notif));
         }
+
         $lastCall = $this->getHeureLastCall();
+        $notif['dref'] = $lastCall['dref'];
         $notif['caller'] = $lastCall['caller'];
         $notif['callee'] = $lastCall['callee'];
         $notif['redirectingNumber'] = $this->whoIsNumber($lastCall['redirectingnumber']);
-
         $listeNumerosAcceptes = explode(',', $this->context->employee->keyyo_notification_numbers);
         $heureLastNotificationCient = Tools::getValue('heureLN');
         $heureLastNotificationServeur = $lastCall['tsms'];
@@ -334,26 +340,16 @@ class AdminKeyyoController extends ModuleAdminController
                             . '</p><p>' . $result['date_posted'] . '</p></td><td>' . $result['comment'] . '</td></tr>';
                     }
 
-                    $notif['messageHistorique'] = 'Appel de ' . $notif['callerName'] . ' à '
+                    $notif['messageHistorique'] = 'Merci de rappeler ' . $notif['callerName'] . ' à '
                         . date('H:i:s \l\e d-m-Y', substr($notif['heureServeur'], 0, 10))
                         . ' Numéro : ' . wordwrap('+' . $notif['caller'], 2, " ", 1);
                     $notif['message'] = 'Numéro trouvé.';
                 } else {
-                    $notif['messageHistorique'] = 'Appel du : ' . wordwrap('+' . $notif['caller'], 2, " ", 1) . ' à '
+                    $notif['messageHistorique'] = 'Merci de rappeler le ' . wordwrap('+' . $notif['caller'], 2, " ", 1) . ' à '
                         . date('H:i:s \l\e d-m-Y', substr($notif['heureServeur'], 0, 10));
                     $notif['message'] = 'Numéro non trouvé.';
                 }
 
-//                $notif['redirectingNumber'] = (strlen($notif['redirectingNumber']) % 2)
-//                    ? '+' . $notif['redirectingNumber']
-//                    : $notif['redirectingNumber'];
-//
-//                $notif['callee'] = (strlen($notif['callee']) % 2) ? '+' . $notif['callee'] : $notif['callee'];
-//                $notif['caller'] = (strlen($notif['caller']) % 2) ? '+' . $notif['caller'] : $notif['caller'];
-
-//                $notif['redirectingNumber'] = wordwrap($notif['redirectingNumber'], 2, " ", 1);
-//                $notif['caller'] = wordwrap($notif['caller'], 2, " ", 1);
-//                $notif['callee'] = wordwrap($notif['callee'], 2, " ", 1);
 
                 $tokenLiteComment = Tools::getAdminTokenLite('AdminKeyyo');
                 $notif['linkPostComment'] = self::$currentIndex . '&controller=AdminKeyyo&ajax=1&action=KeyyoComment&token='
@@ -458,31 +454,152 @@ class AdminKeyyoController extends ModuleAdminController
             }
         }
 
-
         if (!$req or !$req_cm) {
             die(Tools::jsonEncode(array('message' => '2')));
         } else {
             die(Tools::jsonEncode(array('message' => 'ok')));
         }
+    }
 
+    public function whoIsCustomerNumber($number)
+    {
+        $n = pSQL(substr($number, 2));
+        $query = new DbQuery();
+        $query->select('a.*, c.*')
+            ->from('address', 'a')
+            ->leftJoin('customer', 'c', 'a.id_customer = c.id_customer')
+            ->where('a.phone LIKE "%' . $n . '" OR a.phone_mobile LIKE "%' . $n . '"')
+            ->orderBy('c.date_upd DESC');
 
+        $results = Db::getInstance()->getRow($query);
+
+        return $results;
     }
 
     public function whoIsNumber($number = '.')
     {
         $query = new DbQuery();
 
-        $query  ->select('e.lastname, e.firstname')
-                ->from('employee', 'e')
-                ->where('e.keyyo_caller = "' . $number .'"' );
+        $query->select('e.lastname, e.firstname')
+            ->from('employee', 'e')
+            ->where('e.keyyo_caller = "' . $number . '"');
 
         $result = Db::getInstance()->getRow($query);
 
         if ($result) {
-            return strtoupper($result['lastname']) . ' ' . substr($result['firstname'],0,1) .'.';
+            return strtoupper($result['lastname']) . ' ' . substr($result['firstname'], 0, 1) . '.';
         } else {
             return $number;
         }
 
     }
+
+    public function linkRappel($number, $params)
+    {
+        $customer = $this->whoIsCustomerNumber($number);
+        if ($customer) {
+            $caller = strtoupper($customer['lastname']) . ' ' . $customer['firstname'];
+        } else {
+            $caller = $number;
+        }
+
+        $tokenLiteComment = Tools::getAdminTokenLite('AdminKeyyo');
+        $link = '<a class="linkRappel" href="' . self::$currentIndex . '&controller=AdminKeyyo&ajax=1&number='
+            . $params['caller'] . '&action=RappelNumber&token=' . $tokenLiteComment
+            . '&callee=' . $params['callee'] . '&redirectingNumber=' . $params['redirectingnumber']
+            . '&tsms=' . $params['tsms']
+            . '&dref=' . $params['dref'] . ' ">' . $caller . '</a>';
+        return $link;
+    }
+
+    public function ajaxProcessRappelNumber()
+    {
+        $notif = array(
+            'show' => 'true',
+            'heureClient' => '',
+            'heureServeur' => Tools::getValue('tsms'),
+            'callee' => Tools::getValue('callee'),
+            'caller' => Tools::getValue('number'),
+            'redirectingNumber' => $this->whoIsNumber(Tools::getValue('redirectingNumber')),
+            'linkCustomer' => '',
+            'message' => '',
+            'callerName' => '',
+            'histoMessage' => array(),
+            'dateMessage' => '',
+            'messageHistorique' => '',
+            'id_customer' => '',
+            'id_employee' => '',
+            'linkPostComment' => '',
+            'historique_contact' => '',
+            'dref' => Tools::getValue('dref')
+        );
+
+        $query = new DbQuery();
+        $query->select('a.*, c.*')
+            ->from('address', 'a')
+            ->leftJoin('customer', 'c', 'a.id_customer = c.id_customer')
+            ->where('a.phone LIKE "%' . pSQL(substr($notif['caller'], 2)) . '" OR a.phone_mobile LIKE "%' . pSQL(substr($notif['caller'], 2)) . '"')
+            ->orderBy('c.date_upd DESC');
+
+        $results = Db::getInstance()->getRow($query);
+        // Si le numéro caller est trouvé
+        if ($results) {
+            // Création du lien vers la fiche client
+            $tokenLite = Tools::getAdminTokenLite('AdminCustomers');
+            $link = self::$currentIndex . '&controller=AdminCustomers&id_customer=' . $results['id_customer']
+                . '&viewcustomer&token=' . $tokenLite;
+            $notif['linkCustomer'] = $link;
+
+            $notif['callerName'] = strtoupper($results['lastname']) . ' ' . ucfirst($results['firstname']);
+            $notif['id_customer'] = $results['id_customer'];
+            $notif['id_employe'] = $results['id_employee'];
+
+            $query = new DbQuery();
+            $query->select('cc.*')
+                ->from('customer_comments', 'cc')
+                ->where('id_customer = "' . pSQL($results['id_customer']) . '"')
+                ->orderBy('cc.date_posted DESC')
+                ->limit(5);
+            $resultsComments = Db::getInstance()->executeS($query);
+
+            foreach ($resultsComments as $result) {
+                $employe = new Employee($result['id_employee']);
+
+                $notif['histoMessage'][] = '<tr><td><p>' . $employe->firstname[0] . '. ' . $employe->lastname
+                    . '</p><p>' . $result['date_posted'] . '</p></td><td>' . $result['comment'] . '</td></tr>';
+            }
+
+            $notif['messageHistorique'] = 'Merci de rappeler ' . $notif['callerName'] . ' à '
+                . date('H:i:s \l\e d-m-Y', substr($notif['heureServeur'], 0, 10))
+                . ' Numéro : ' . wordwrap('+' . $notif['caller'], 2, " ", 1);
+            $notif['message'] = 'Numéro trouvé.';
+        } else {
+            $notif['messageHistorique'] = 'Merci de rappeler le ' . wordwrap('+' . $notif['caller'], 2, " ", 1) . ' à '
+                . date('H:i:s \l\e d-m-Y', substr($notif['heureServeur'], 0, 10));
+            $notif['message'] = 'Numéro non trouvé.';
+        }
+
+
+        $tokenLiteComment = Tools::getAdminTokenLite('AdminKeyyo');
+        $notif['linkPostComment'] = self::$currentIndex . '&controller=AdminKeyyo&ajax=1&action=KeyyoComment&token='
+            . $tokenLiteComment;
+
+        $notif['dateMessage'] = date('Y-m-d à H:i:s', substr($notif['heureServeur'], 0, 10));
+        die(Tools::jsonEncode($notif));
+    }
+
+    public function setType($type)
+    {
+        $r = '';
+
+        if ($type == 'SETUP') {
+            $r = '<i class="icon-arrow-left text-success setType"></i>';
+        } else if ($type == 'RELEASE') {
+            $r = '<i class="icon-arrow-right text-danger setType"></i>';
+        } else {
+            $r = '<i class="icon-phone text-info setType"></i>';
+        }
+        return $r;
+    }
+
 }
