@@ -153,7 +153,6 @@ $(document).ready(function (e) {
 
     // Crée le contenu d'un nouvel appel qui sera intégré dans la fenetre modale
     function nouvelAppel(data) {
-        console.log(data.dref); // TODO reprendre ici, integre dref dans la fentre modale
         d = new Date(data.heureServeur * 1000);
         heureAppel = d.getHours() + ' : ' + d.getMinutes();
         var idHeureServeur = data.heureServeur;
@@ -194,7 +193,8 @@ $(document).ready(function (e) {
                 'id_customer': data.id_customer,
                 'id_textearea': id_textarea,
                 'id_contact': id_contact,
-                'historique_contact': historique_contact
+                'historique_contact': historique_contact,
+                'data-dref' : data.dref
             }).click(function (e) {
                 e.preventDefault();
                 var link = $(this).attr('href');
@@ -202,6 +202,7 @@ $(document).ready(function (e) {
                 var comment = $('#' + $(this).attr('id_textearea')).val();
                 var id_contact = $('#' + $(this).attr('id_contact')).val();
                 var historique_contact = $('#' + $(this).attr('historique_contact')).attr('checked');
+                var dref = $(this).attr('data-dref');
 
                 $.ajax({
                     url: link,
@@ -210,7 +211,8 @@ $(document).ready(function (e) {
                         'id_customer': id_customer,
                         'id_contact': id_contact,
                         'comment': comment,
-                        'historique_contact': historique_contact
+                        'historique_contact': historique_contact,
+                        'dref': dref
                     },
                     dataType: 'json'
                 })

@@ -79,9 +79,13 @@ class AdminKeyyoController extends ModuleAdminController
                 'align' => 'center',
                 'callback' => 'setType'
             ),
+            'status' => array(
+                'title' => $this->l('ok'),
+                'class' => 'fixed-width-xs',
+            ),
             'caller' => array(
                 'title' => $this->l('Appel de'),
-                'class' => 'col-md-2 numberCaller',
+                'class' => 'col-md-3 numberCaller',
                 'callback' => 'linkRappel'
             ),
         );
@@ -413,6 +417,7 @@ class AdminKeyyoController extends ModuleAdminController
             'id_customer' => Tools::getValue('id_customer'),
             'id_employee' => $employee->id,
             'comment' => Tools::getValue('comment'),
+            'dref' => Tools::getValue('dref')
         );
 
 
@@ -457,7 +462,10 @@ class AdminKeyyoController extends ModuleAdminController
         if (!$req or !$req_cm) {
             die(Tools::jsonEncode(array('message' => '2')));
         } else {
+            $this->updateStatus($comment['dref']);
             die(Tools::jsonEncode(array('message' => 'ok')));
+
+
         }
     }
 
@@ -498,17 +506,17 @@ class AdminKeyyoController extends ModuleAdminController
     {
         $customer = $this->whoIsCustomerNumber($number);
         if ($customer) {
-            $caller = strtoupper($customer['lastname']) . ' ' . $customer['firstname'];
+            $caller = strtoupper($customer['lastname']) . ' ' . $customer['firstname'] . '</a>';
         } else {
-            $caller = $number;
+            $caller = '</a>';
         }
 
         $tokenLiteComment = Tools::getAdminTokenLite('AdminKeyyo');
-        $link = '<a class="linkRappel" href="' . self::$currentIndex . '&controller=AdminKeyyo&ajax=1&number='
+        $link = $number . ' - <a class="linkRappel" href="' . self::$currentIndex . '&controller=AdminKeyyo&ajax=1&number='
             . $params['caller'] . '&action=RappelNumber&token=' . $tokenLiteComment
             . '&callee=' . $params['callee'] . '&redirectingNumber=' . $params['redirectingnumber']
             . '&tsms=' . $params['tsms']
-            . '&dref=' . $params['dref'] . ' ">' . $caller . '</a>';
+            . '&dref=' . $params['dref'] . ' ">' . $caller . '<i class="' . $params['dref'] . '"></i> ';
         return $link;
     }
 
@@ -600,6 +608,21 @@ class AdminKeyyoController extends ModuleAdminController
             $r = '<i class="icon-phone text-info setType"></i>';
         }
         return $r;
+    }
+
+    public function updateStatus($dref)
+    {
+        if (Db::getInstance()->getValue('SELECT status FROM ' . _DB_PREFIX_ . $this->table . ' WHERE dref = "' . pSQL($dref) . '"')) {
+            // try to disable
+            if (!Db::getInstance()->update($this->table, array('status' => 0), 'dref = "' . (pSQL($dref) . '"')))
+                $this->_errors[] = Tools::displayError('Error:') . ' ' . mysql_error();
+            else return true;
+        } else {
+            // try to enable
+            if (!Db::getInstance()->update($this->table, array('status' => 1), 'dref = "' . pSQL($dref) . '"'))
+                $this->_errors[] = Tools::displayError('Error:') . ' ' . mysql_error();
+            else return true;
+        }
     }
 
 }

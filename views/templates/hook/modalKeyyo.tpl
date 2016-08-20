@@ -51,7 +51,7 @@
                                     <input id="historique_contact" name="historique_contact" type="checkbox"> Ajouter également à l'historique de contact
                                 </label>
                             </div>
-                            <button href="#" id="submitCustomerComment" type="submit" class="btn btn-info input-block-level form-control submitCustomerComment" name="submitCustomerComment">Transmettre le message</button>
+                            <button href="#" data-dref="" id="submitCustomerComment" type="submit" class="btn btn-info input-block-level form-control submitCustomerComment" name="submitCustomerComment">Transmettre le message</button>
                         </div>
                     </div>
                 </form>
