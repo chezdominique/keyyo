@@ -79,10 +79,6 @@ class AdminKeyyoController extends ModuleAdminController
                 'align' => 'center',
                 'callback' => 'setType'
             ),
-            'status' => array(
-                'title' => $this->l('ok'),
-                'class' => 'fixed-width-xs',
-            ),
             'caller' => array(
                 'title' => $this->l('Appel de'),
                 'class' => 'col-md-3 numberCaller',
@@ -462,8 +458,8 @@ class AdminKeyyoController extends ModuleAdminController
         if (!$req or !$req_cm) {
             die(Tools::jsonEncode(array('message' => '2')));
         } else {
-            $this->updateStatus($comment['dref']);
-            die(Tools::jsonEncode(array('message' => 'ok')));
+            $status = $this->updateStatus($comment['dref']);
+            die(Tools::jsonEncode(array('message' => 'ok', 'status' => $status)));
 
 
         }
@@ -504,6 +500,7 @@ class AdminKeyyoController extends ModuleAdminController
 
     public function linkRappel($number, $params)
     {
+        $status = ($params['status'])?' <i class="icon-check text-success"></i>':'';
         $customer = $this->whoIsCustomerNumber($number);
         if ($customer) {
             $caller = strtoupper($customer['lastname']) . ' ' . $customer['firstname'] . '</a>';
@@ -512,11 +509,11 @@ class AdminKeyyoController extends ModuleAdminController
         }
 
         $tokenLiteComment = Tools::getAdminTokenLite('AdminKeyyo');
-        $link = $number . ' - <a class="linkRappel" href="' . self::$currentIndex . '&controller=AdminKeyyo&ajax=1&number='
+        $link = $number . ' - <a class="linkRappel '.$params['dref'] .'" href="' . self::$currentIndex . '&controller=AdminKeyyo&ajax=1&number='
             . $params['caller'] . '&action=RappelNumber&token=' . $tokenLiteComment
             . '&callee=' . $params['callee'] . '&redirectingNumber=' . $params['redirectingnumber']
             . '&tsms=' . $params['tsms']
-            . '&dref=' . $params['dref'] . ' ">' . $caller . '<i class="' . $params['dref'] . '"></i> ';
+            . '&dref=' . $params['id_notification_keyyo'] . ' ">' . $caller . ' ' . $status;
         return $link;
     }
 
@@ -539,7 +536,7 @@ class AdminKeyyoController extends ModuleAdminController
             'id_employee' => '',
             'linkPostComment' => '',
             'historique_contact' => '',
-            'dref' => Tools::getValue('dref')
+            'dref' => NotificationKeyyoClass::getDref(Tools::getValue('dref'))
         );
 
         $query = new DbQuery();
@@ -577,12 +574,12 @@ class AdminKeyyoController extends ModuleAdminController
                     . '</p><p>' . $result['date_posted'] . '</p></td><td>' . $result['comment'] . '</td></tr>';
             }
 
-            $notif['messageHistorique'] = 'Merci de rappeler ' . $notif['callerName'] . ' à '
+            $notif['messageHistorique'] = 'Merci de rappeler ' . $notif['callerName'] . ', appel à '
                 . date('H:i:s \l\e d-m-Y', substr($notif['heureServeur'], 0, 10))
-                . ' Numéro : ' . wordwrap('+' . $notif['caller'], 2, " ", 1);
+                . ' Numéro : ' . $notif['caller'];
             $notif['message'] = 'Numéro trouvé.';
         } else {
-            $notif['messageHistorique'] = 'Merci de rappeler le ' . wordwrap('+' . $notif['caller'], 2, " ", 1) . ' à '
+            $notif['messageHistorique'] = 'Merci de rappeler le ' . $notif['caller'] . ', appel à '
                 . date('H:i:s \l\e d-m-Y', substr($notif['heureServeur'], 0, 10));
             $notif['message'] = 'Numéro non trouvé.';
         }
@@ -612,17 +609,12 @@ class AdminKeyyoController extends ModuleAdminController
 
     public function updateStatus($dref)
     {
-        if (Db::getInstance()->getValue('SELECT status FROM ' . _DB_PREFIX_ . $this->table . ' WHERE dref = "' . pSQL($dref) . '"')) {
-            // try to disable
-            if (!Db::getInstance()->update($this->table, array('status' => 0), 'dref = "' . (pSQL($dref) . '"')))
-                $this->_errors[] = Tools::displayError('Error:') . ' ' . mysql_error();
-            else return true;
-        } else {
-            // try to enable
-            if (!Db::getInstance()->update($this->table, array('status' => 1), 'dref = "' . pSQL($dref) . '"'))
-                $this->_errors[] = Tools::displayError('Error:') . ' ' . mysql_error();
-            else return true;
-        }
+        if (!Db::getInstance()->update($this->table, array('status' => 1), 'dref = "' . pSQL($dref) . '"'))
+            return false;
+        return true;
+
     }
+
+
 
 }

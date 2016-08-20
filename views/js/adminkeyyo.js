@@ -217,6 +217,9 @@ $(document).ready(function (e) {
                     dataType: 'json'
                 })
                     .done(function (data) {
+                        if (data.status == true){
+                            $('.' + dref).append(' <i class="icon-check text-success"></i>');
+                        }
                         messageDone(data.message, idHeureServeur);
                     })
                     .fail(function (data) {
@@ -235,13 +238,15 @@ $(document).ready(function (e) {
                 'href': data.linkPostComment,
                 'id_customer': data.id_customer,
                 'id_textearea': id_textarea,
-                'id_contact': id_contact
+                'id_contact': id_contact,
+                'data-dref' : data.dref
             }).click(function (e) {
                 e.preventDefault();
                 var link = $(this).attr('href');
                 var id_customer = $(this).attr('id_customer');
                 var comment = $('#' + $(this).attr('id_textearea')).val();
                 var id_contact = $('#' + $(this).attr('id_contact')).val();
+                var dref = $(this).attr('data-dref');
 
                 $.ajax({
                     url: link,
@@ -249,11 +254,15 @@ $(document).ready(function (e) {
                     data: {
                         'id_customer': id_customer,
                         'id_contact': id_contact,
-                        'comment': comment
+                        'comment': comment,
+                        'dref': dref
                     },
                     dataType: 'json'
                 })
                     .done(function (data) {
+                        if (data.status == true){
+                            $('.' + dref).append(' <i class="icon-check text-success"></i>');
+                        }
                         messageDone(data.message, idHeureServeur);
                     })
                     .fail(function (data) {

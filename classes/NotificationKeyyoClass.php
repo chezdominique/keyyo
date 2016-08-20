@@ -109,4 +109,14 @@ class NotificationKeyyoClass extends ObjectModel
             'id_employee' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
         ),
     );
+
+    public static function getDref($id)
+    {
+        $sql = 'SELECT `dref` FROM ' . _DB_PREFIX_ . NotificationKeyyoClass::$definition['table']
+            . ' WHERE `id_notification_keyyo` = ' . pSQL($id);
+
+        $req = Db::getInstance()->getValue($sql);
+
+        return $req;
+    }
 }
