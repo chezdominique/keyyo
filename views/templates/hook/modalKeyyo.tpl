@@ -1,6 +1,5 @@
 <div class="remodal" data-remodal-id="modal">
     <a data-remodal-action="close" class="remodal-close"></a>
-    <h1>Appel en cours</h1>
     <div class="container-fluid" id="mainModalKeyyo">
     </div>
     <button data-remodal-action="cancel" class="remodal-cancel">Fermer</button>

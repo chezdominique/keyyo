@@ -34,6 +34,7 @@ class Keyyo extends Module
     protected $tabName;
     protected $errors = array();
     protected $html = '';
+    public $numbers_names = array();
 
     /* Set default configuration values here */
     protected $config = array(
@@ -48,6 +49,11 @@ class Keyyo extends Module
             exit;
         }
 
+        $this->numbers_names = array(
+            '33430966600' => 'Standard L&Sens',
+            '33430966996' => 'DclicBIO',
+            '33430966096' => 'ISONAUTIQUE',
+        );
         $this->name = 'keyyo';
         $this->tableName = 'notification_keyyo';
         $this->tab = 'others';

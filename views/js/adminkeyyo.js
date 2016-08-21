@@ -26,7 +26,7 @@
  */
 $(document).ready(function (e) {
 
-    var tempoNotification = 1000;
+    var tempoNotification = 1500;
     var isEnabled = 'disabled';
     var modalKeyyo = $('[data-remodal-id=modal]').remodal();
 

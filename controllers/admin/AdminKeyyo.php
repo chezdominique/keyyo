@@ -55,23 +55,20 @@ class AdminKeyyoController extends ModuleAdminController
                 'title' => $this->l('ID'),
                 'align' => 'center',
                 'class' => 'fixed-width-xs'),
-            'account' => array(
-                'title' => $this->l('N° KEYYO'),
-                'class' => 'col-md-1',
+            'tsms' => array(
+                'title' => $this->l('Heure'),
+                'class' => 'col-md-2',
+                'callback' => 'formatTime'
             ),
             'callee' => array(
                 'title' => $this->l('Pour le'),
                 'class' => 'col-md-1',
+                'callback' => 'whoIsCallee'
             ),
             'redirectingnumber' => array(
                 'title' => $this->l('Renvoi de'),
                 'class' => 'col-md-1',
                 'callback' => 'whoIsNumber',
-            ),
-            'tsms' => array(
-                'title' => $this->l('Heure'),
-                'class' => 'col-md-2',
-                'callback' => 'formatTime'
             ),
             'type' => array(
                 'title' => $this->l('Type'),
@@ -82,7 +79,8 @@ class AdminKeyyoController extends ModuleAdminController
             'caller' => array(
                 'title' => $this->l('Appel de'),
                 'class' => 'col-md-3 numberCaller',
-                'callback' => 'linkRappel'
+                'callback' => 'linkRappel',
+                'search' => true
             ),
         );
 
@@ -104,9 +102,6 @@ class AdminKeyyoController extends ModuleAdminController
         if (isset($this->_filter) && trim($this->_filter) == '')
             $this->_filter = $this->original_filter;
 
-        $this->addRowAction('view');
-        $this->addRowAction('add');
-        $this->addRowAction('edit');
         $this->addRowAction('delete');
 
         return parent::renderList();
@@ -500,7 +495,7 @@ class AdminKeyyoController extends ModuleAdminController
 
     public function linkRappel($number, $params)
     {
-        $status = ($params['status'])?' <i class="icon-check text-success"></i>':'';
+        $status = ($params['status']) ? ' <i class="icon-check text-success"></i>' : '';
         $customer = $this->whoIsCustomerNumber($number);
         if ($customer) {
             $caller = strtoupper($customer['lastname']) . ' ' . $customer['firstname'] . '</a>';
@@ -509,7 +504,7 @@ class AdminKeyyoController extends ModuleAdminController
         }
 
         $tokenLiteComment = Tools::getAdminTokenLite('AdminKeyyo');
-        $link = $number . ' - <a class="linkRappel '.$params['dref'] .'" href="' . self::$currentIndex . '&controller=AdminKeyyo&ajax=1&number='
+        $link = $number . ' - <a class="linkRappel ' . $params['dref'] . '" href="' . self::$currentIndex . '&controller=AdminKeyyo&ajax=1&number='
             . $params['caller'] . '&action=RappelNumber&token=' . $tokenLiteComment
             . '&callee=' . $params['callee'] . '&redirectingNumber=' . $params['redirectingnumber']
             . '&tsms=' . $params['tsms']
@@ -615,6 +610,9 @@ class AdminKeyyoController extends ModuleAdminController
 
     }
 
-
+    public function whoIsCallee($n)
+    {
+        return ($this->module->numbers_names[$n]) ? $this->module->numbers_names[$n] : $n;
+    }
 
 }
