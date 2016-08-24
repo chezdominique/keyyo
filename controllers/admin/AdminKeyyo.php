@@ -408,8 +408,9 @@ class AdminKeyyoController extends ModuleAdminController
             'id_customer' => Tools::getValue('id_customer'),
             'id_employee' => $employee->id,
             'comment' => Tools::getValue('comment'),
-            'dref' => Tools::getValue('dref')
         );
+
+        $dref = Tools::getValue('dref');
 
 
         if (!Validate::isCleanHtml($comment['comment']) or
@@ -453,7 +454,7 @@ class AdminKeyyoController extends ModuleAdminController
         if (!$req or !$req_cm) {
             die(Tools::jsonEncode(array('message' => '2')));
         } else {
-            $status = $this->updateStatus($comment['dref']);
+            $status = $this->updateStatus($dref);
             die(Tools::jsonEncode(array('message' => 'ok', 'status' => $status)));
 
 
