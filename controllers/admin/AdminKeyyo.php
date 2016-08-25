@@ -335,12 +335,12 @@ class AdminKeyyoController extends ModuleAdminController
                             . '</p><p>' . $result['date_posted'] . '</p></td><td>' . $result['comment'] . '</td></tr>';
                     }
 
-                    $notif['messageHistorique'] = 'Merci de rappeler ' . $notif['callerName'] . ' à '
+                    $notif['messageHistorique'] = 'Merci de rappeler ' . $notif['callerName'] . ', appel à '
                         . date('H:i:s \l\e d-m-Y', substr($notif['heureServeur'], 0, 10))
-                        . ' Numéro : ' . wordwrap('+' . $notif['caller'], 2, " ", 1);
+                        . ' numéro : ' . $notif['caller'];
                     $notif['message'] = 'Numéro trouvé.';
                 } else {
-                    $notif['messageHistorique'] = 'Merci de rappeler le ' . wordwrap('+' . $notif['caller'], 2, " ", 1) . ' à '
+                    $notif['messageHistorique'] = 'Merci de rappeler le ' . $notif['caller'] . ', appel à '
                         . date('H:i:s \l\e d-m-Y', substr($notif['heureServeur'], 0, 10));
                     $notif['message'] = 'Numéro non trouvé.';
                 }
@@ -572,7 +572,7 @@ class AdminKeyyoController extends ModuleAdminController
 
             $notif['messageHistorique'] = 'Merci de rappeler ' . $notif['callerName'] . ', appel à '
                 . date('H:i:s \l\e d-m-Y', substr($notif['heureServeur'], 0, 10))
-                . ' Numéro : ' . $notif['caller'];
+                . ' numéro : ' . $notif['caller'];
             $notif['message'] = 'Numéro trouvé.';
         } else {
             $notif['messageHistorique'] = 'Merci de rappeler le ' . $notif['caller'] . ', appel à '
