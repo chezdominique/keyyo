@@ -478,24 +478,27 @@ class AdminKeyyoController extends ModuleAdminController
 
     public function whoIsNumber($number = '.')
     {
-        $query = new DbQuery();
+        if (!empty($number)) {
 
-        $query->select('e.lastname, e.firstname')
-            ->from('employee', 'e')
-            ->where('e.keyyo_caller = "' . $number . '"');
+            $query = new DbQuery();
 
-        $result = Db::getInstance()->getRow($query);
+            $query->select('e.lastname, e.firstname')
+                ->from('employee', 'e')
+                ->where('e.keyyo_caller = "' . $number . '"');
 
-        if ($result) {
-            return strtoupper($result['lastname']) . ' ' . substr($result['firstname'], 0, 1) . '.';
-        } else {
-            return $number;
+            $result = Db::getInstance()->getRow($query);
+
+            if ($result) {
+                return strtoupper($result['lastname']) . ' ' . substr($result['firstname'], 0, 1) . '.';
+            }
+        }else {
+                return $number;
         }
-
     }
 
     public function linkRappel($number, $params)
     {
+        $num = $this->whoIsCallee($number);
         $status = ($params['status']) ? ' <i class="icon-check text-success"></i>' : '';
         $customer = $this->whoIsCustomerNumber($number);
         if ($customer) {
@@ -505,7 +508,7 @@ class AdminKeyyoController extends ModuleAdminController
         }
 
         $tokenLiteComment = Tools::getAdminTokenLite('AdminKeyyo');
-        $link = $number . ' - <a class="linkRappel ' . $params['dref'] . '" href="' . self::$currentIndex . '&controller=AdminKeyyo&ajax=1&number='
+        $link = $num . ' - <a class="linkRappel ' . $params['dref'] . '" href="' . self::$currentIndex . '&controller=AdminKeyyo&ajax=1&number='
             . $params['caller'] . '&action=RappelNumber&token=' . $tokenLiteComment
             . '&callee=' . $params['callee'] . '&redirectingNumber=' . $params['redirectingnumber']
             . '&tsms=' . $params['tsms']
@@ -613,7 +616,7 @@ class AdminKeyyoController extends ModuleAdminController
 
     public function whoIsCallee($n)
     {
-        return ($this->module->numbers_names[$n]) ? $this->module->numbers_names[$n] : $n;
+        return (isset($this->module->numbers_names[$n])) ? $this->module->numbers_names[$n] : $n;
     }
 
 }
